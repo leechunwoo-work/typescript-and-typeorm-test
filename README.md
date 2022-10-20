@@ -1,2 +1,2 @@
-push test 22
+push test
 
