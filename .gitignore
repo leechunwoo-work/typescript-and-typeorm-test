@@ -105,3 +105,6 @@ dist
 
 # osx
 .DS_Store
+
+# build 파일
+build
