@@ -1,2 +1,1 @@
-push test
-
+typescript-and-typeorm-test
