@@ -1,24 +1,29 @@
-console.log('Try npm run lint/fix!');
+import 'reflect-metadata';
+import 'dotenv/config';
+import { AppDataSource } from './migrations/data-source';
+import express, { Request, Response, NextFunction } from 'express';
+import cors from 'cors';
+import morgan from 'morgan';
 
-const longString =
-  'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer ut aliquet diam.';
+AppDataSource.initialize()
+  .then(() => {
+    console.log('db connection complete');
+  })
+  .catch((error: object) => {
+    console.error('db connection failed', error);
+  });
 
-const trailing = 'Semicolon';
+const app = express();
 
-const why = 'am I tabbed?';
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(morgan('dev'));
+app.use(
+  cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+    credentials: true,
+  })
+);
 
-export function doSomeStuff(
-  withThis: string,
-  andThat: string,
-  andThose: string[]
-) {
-  //function on one line
-  if (!andThose.length) {
-    return false;
-  }
-  console.log(withThis);
-  console.log(andThat);
-  console.dir(andThose);
-  return;
-}
-// TODO: more examples
+export default app;

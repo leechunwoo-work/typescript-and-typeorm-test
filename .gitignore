@@ -1,3 +1,9 @@
+# TypeORM
+.idea/
+.vscode/
+tmp/
+temp/
+
 # Logs
 logs
 *.log
