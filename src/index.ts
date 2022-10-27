@@ -1,9 +1,11 @@
 import 'reflect-metadata';
 import 'dotenv/config';
 import { AppDataSource } from './migrations/data-source';
-import express, { Request, Response, NextFunction } from 'express';
+import express, { Request, Response } from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
+
+import { Error } from './interfaces/error';
 
 AppDataSource.initialize()
   .then(() => {
@@ -38,16 +40,19 @@ app.use((req: Request, res: Response) => {
   return res.status(404).send('API 주소를 확인해주세요.');
 });
 
-// TODO: error 객체 인터페이스 생성 필요
-// app.use((err: , req: Request, res: Response) => {
-//   return res.status(err.status).send({
-//     message: err.message,
-//     data: {
-//       errorCode: err.errorCode
-//     }
-//   });
-// });
+app.use((error: Error, req: Request, res: Response) => {
+  return res.status(error.status).send({
+    message: error.message,
+    data: {
+      errorCode: error.code,
+    },
+  });
+});
 
-app.listen(3005);
+const port = process.env.PORT;
+
+app.listen(port, () => {
+  console.log('server connection complete');
+});
 
 export default app;
