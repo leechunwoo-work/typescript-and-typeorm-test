@@ -8,5 +8,6 @@ export class Character extends DefaultEntity {
 
   @Column() type: number;
 
-  @ManyToOne(() => User, user => user.characters) user: User;
+  @ManyToOne(() => User, user => user.characters, { nullable: false })
+  user: User;
 }

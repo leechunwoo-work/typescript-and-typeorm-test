@@ -10,7 +10,7 @@ export class Todo extends DefaultEntity {
 
   @Column() exprience: number;
 
-  @Column() isCompleted: boolean;
+  @Column({ default: false }) isCompleted: boolean;
 
   @ManyToMany(() => User, user => user.todos) users: User[];
 }

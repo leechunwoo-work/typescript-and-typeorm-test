@@ -9,5 +9,5 @@ export const AppDataSource = new DataSource({
   password: process.env.DB_PASSWORD || '',
   database: process.env.DB_NAME || 'Test',
   logging: true,
-  entities: ['../entities/*.ts'],
+  entities: ['./src/entities/*.ts'],
 });

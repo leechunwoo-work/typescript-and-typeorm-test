@@ -7,7 +7,7 @@ import { Todo } from './Todo';
 export class User extends DefaultEntity {
   @Column({ length: 16 }) loginId: string;
 
-  @Column({ length: 64 }) password: string;
+  @Column({ length: 64, nullable: true }) password: string;
 
   @Column({ nullable: true }) email: string;
 
@@ -15,9 +15,9 @@ export class User extends DefaultEntity {
 
   @Column({ length: 16 }) nickname: string;
 
-  @Column({ length: 163 }) pushToken: string;
+  @Column({ length: 163, nullable: true }) pushToken: string;
 
-  @Column({ length: 7 }) os: string;
+  @Column({ length: 7, nullable: true }) os: string;
 
   @Column() authenticationType: number;
 
