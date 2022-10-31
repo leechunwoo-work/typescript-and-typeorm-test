@@ -1,11 +1,12 @@
 import 'reflect-metadata';
 import 'dotenv/config';
 import { AppDataSource } from './migrations/data-source';
-import express, { Request, Response } from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
 
 import { Error } from './interfaces/error';
+import routes from './routes';
 
 AppDataSource.initialize()
   .then(() => {
@@ -29,8 +30,7 @@ app.use(
 );
 
 // Route
-// TODO: routes 폴더 생성 필요
-// app.use('/', routes);
+app.use('/', routes);
 
 app.get('/', (req: Request, res: Response) => {
   return res.status(200).send('Hello World!');
@@ -40,7 +40,7 @@ app.use((req: Request, res: Response) => {
   return res.status(404).send('API 주소를 확인해주세요.');
 });
 
-app.use((error: Error, req: Request, res: Response) => {
+app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
   return res.status(error.status).send({
     message: error.message,
     data: {
