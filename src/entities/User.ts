@@ -15,7 +15,7 @@ export class User extends DefaultEntity {
 
   @Column({ length: 16 }) nickname: string;
 
-  @Column({ length: 163, nullable: true }) pushToken: string;
+  @Column({ length: 163, nullable: true, unique: true }) pushToken: string;
 
   @Column({ length: 7, nullable: true }) os: string;
 
