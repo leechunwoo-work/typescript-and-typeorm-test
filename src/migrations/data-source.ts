@@ -8,6 +8,8 @@ export const AppDataSource = new DataSource({
   username: process.env.DB_USERNAME || 'root',
   password: process.env.DB_PASSWORD || '',
   database: process.env.DB_NAME || 'Test',
-  logging: true,
+  logging: ['warn', 'error'],
   entities: ['./src/entities/*.ts'],
+  // FIXME: 절대 상의없이 키지 말 것
+  // synchronize: true,
 });

@@ -8,7 +8,7 @@ export class Todo extends DefaultEntity {
 
   @Column() category: string;
 
-  @Column() exprience: number;
+  @Column() experience: number;
 
   @Column({ default: false }) isCompleted: boolean;
 

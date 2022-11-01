@@ -51,8 +51,8 @@ app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
   });
 });
 
-const port = process.env.PORT;
+const port = process.env.SERVER_PORT;
 
 app.listen(port, () => {
-  logger.info('server connection complete');
+  logger.info(`server ${port} connection complete`);
 });
