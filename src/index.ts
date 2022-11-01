@@ -7,13 +7,14 @@ import morgan from 'morgan';
 
 import { Error } from './interfaces/error';
 import routes from './routes';
+import { logger } from './utils';
 
 AppDataSource.initialize()
   .then(() => {
-    console.log('db connection complete');
+    logger.info('db connection complete');
   })
   .catch((error: object) => {
-    console.error('db connection failed', error);
+    logger.error(error);
   });
 
 const app = express();
@@ -53,7 +54,5 @@ app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
 const port = process.env.PORT;
 
 app.listen(port, () => {
-  console.log('server connection complete');
+  logger.info('server connection complete');
 });
-
-export default app;
