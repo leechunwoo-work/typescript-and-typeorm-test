@@ -40,6 +40,7 @@ app.use((req: Request, res: Response) => {
   return res.status(404).send('API 주소를 확인해주세요.');
 });
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
   return res.status(error.status).send({
     message: error.message,

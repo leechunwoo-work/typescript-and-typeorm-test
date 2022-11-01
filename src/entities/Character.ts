@@ -4,7 +4,7 @@ import { User } from './User';
 
 @Entity()
 export class Character extends DefaultEntity {
-  @Column() exprience: number;
+  @Column({ default: 0 }) exprience: number;
 
   @Column() type: number;
 
