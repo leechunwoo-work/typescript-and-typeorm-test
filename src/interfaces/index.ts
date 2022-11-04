@@ -1,5 +1,2 @@
-import { Error } from './error';
-
-export default {
-  Error,
-};
+export { Error } from './error';
+export * as Todo from './todo';

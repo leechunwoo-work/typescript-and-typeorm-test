@@ -1,15 +1,65 @@
-// import { AppDataSource } from '../../migrations/data-source';
-// import Todo from '../../entities';
-// import { Request, Response, NextFunction } from 'express';
-// import todo from '../../models';
+import { Request, Response, NextFunction } from 'express';
+import Ajv from 'ajv';
+import { Todo } from '../interfaces';
+import { todo } from '../models';
+import { undefinedError } from '../errors/code';
 
-// export default async (req: Request, res: Response, next: NextFunction) => {
-//   try {
-//     const { category, context, experience } = req.body;
+const ajv = new Ajv({ useDefaults: false });
 
-//     await todo.create(category, context, experience);
-//   } catch (error) {
-//     console.log(error);
-//     // next(undefinedError);
-//   }
-// };
+export const create = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { category, context, experience }:
+      { category: string, context: string, experience: number } = req.body;
+
+    const schema = {
+      type: 'object',
+      properties: {
+        category: { type: 'string', minLength: 1 },
+        context: { type: 'string', minLength: 1 },
+        experience: { type: 'number' },
+      },
+      required: ['category', 'context', 'experience'],
+      additionalProperties: false,
+    };
+
+    const validate = ajv.compile(schema);
+
+    if (validate(req.body)) {
+      await todo.create(category, context, experience);
+    } else {
+      next();
+    }
+  } catch (error) {
+    console.log(error);
+    next(undefinedError);
+  }
+};
+
+export const update = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { category, context, experience, isComplete }:
+      { category: string, context: string, experience: number, isComplete: boolean } = req.body;
+
+    const schema = {
+      type: 'object',
+      properties: {
+        category: { type: 'string', minLength: 1 },
+        context: { type: 'string', minLength: 1 },
+        experience: { type: 'number' },
+      },
+      required: ['category', 'context', 'experience'],
+      additionalProperties: false,
+    };
+
+    const validate = ajv.compile(schema);
+
+    if (validate(req.body)) {
+      await todo.create(category, context, experience);
+    } else {
+      next();
+    }
+  } catch (error) {
+    console.log(error);
+    next(undefinedError);
+  }
+};

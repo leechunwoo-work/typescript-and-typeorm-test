@@ -1,9 +1,3 @@
-import { User } from './User';
-import { Character } from './Character';
-import { Todo } from './Todo';
-
-export default {
-  User,
-  Character,
-  Todo,
-};
+export { User } from './User';
+export { Character } from './Character';
+export { Todo } from './Todo';
