@@ -25,7 +25,7 @@
       }
     ],
     "max-len": [
-      "errors",
+      "error",
       130
     ],
     "no-restricted-properties": [

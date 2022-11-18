@@ -1,11 +1,7 @@
 import { AppDataSource } from '../migrations/data-source';
 import { Todo } from '../entities';
 
-export const create = async (
-  category: string,
-  context: string,
-  experience: number
-) => {
+export const create = async (category: string, context: string, experience: number) => {
   const info = {
     category,
     context,

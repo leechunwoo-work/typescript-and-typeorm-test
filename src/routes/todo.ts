@@ -1,8 +1,8 @@
-import { Router, Request, Response } from 'express';
-import Ajv, { JSONSchemaType } from 'ajv';
+import { Router } from 'express';
+import { todo } from '../controllers';
 
 const router = Router();
 
-router.post('/',);
+router.post('/', todo.create);
 
 export default router;
