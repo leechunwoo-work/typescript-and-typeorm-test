@@ -24,14 +24,14 @@ module.exports = {
     // 파일 이름을 가져온다.
     const fileName = projectFilePath.match(/[^/]+$/)[0];
     const param = {
-      Bucket: process.env.S3_BUCKET,
+      Bucket: process.env.S3_BUCKET as string,
       Key: `${uploadPath}/${fileName}`,
       ACL: 'public-read',
       Body: fs.createReadStream(absoluteFilePath),
     };
     s3.upload(param, err => {
       if (err) {
-        throw Error(err);
+        throw err
       }
     });
   },
