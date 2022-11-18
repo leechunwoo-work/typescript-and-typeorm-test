@@ -1,6 +1,5 @@
-import { Entity, Column, ManyToMany } from 'typeorm';
+import { Entity, Column } from 'typeorm';
 import { DefaultEntity } from './Abstract';
-import { User } from './User';
 
 @Entity()
 export class Todo extends DefaultEntity {
@@ -11,6 +10,4 @@ export class Todo extends DefaultEntity {
   @Column() experience: number;
 
   @Column({ default: false }) isCompleted: boolean;
-
-  @ManyToMany(() => User, user => user.todos) users: User[];
 }
