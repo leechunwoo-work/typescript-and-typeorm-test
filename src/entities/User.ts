@@ -1,7 +1,6 @@
 import { Entity, Column, OneToMany, ManyToMany, JoinTable } from 'typeorm';
 import { DefaultEntity } from './Abstract';
-import { Character } from './Character';
-import { Todo } from './Todo';
+import { Todo, Character, Bookmark, Notification } from './';
 
 @Entity()
 export class User extends DefaultEntity {
@@ -29,7 +28,13 @@ export class User extends DefaultEntity {
   @OneToMany(() => Character, character => character.user)
   characters: Character[];
 
-  @ManyToMany(() => Todo, todo => todo.users, { cascade: true })
+  @OneToMany(() => Bookmark, bookmark => bookmark.user)
+  bookmarks: Bookmark[];
+
+  @OneToMany(() => Notification, notification => notification.user)
+  notifications: Notification[];
+
+  @ManyToMany(() => Todo, { cascade: true })
   @JoinTable()
   todos: Todo[];
 }
