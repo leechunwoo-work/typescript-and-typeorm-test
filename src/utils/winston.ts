@@ -2,18 +2,11 @@ import config from '../configs/log';
 import winston from 'winston';
 import winstonDaily from 'winston-daily-rotate-file';
 
-const { combine, timestamp, printf, errors, prettyPrint, colorize } =
-  winston.format;
+const { combine, timestamp, printf, errors, prettyPrint, colorize } = winston.format;
 
 const logFormater = printf(config.logFormater);
 const logger = winston.createLogger({
-  format: combine(
-    errors({ stack: true }),
-    colorize(),
-    timestamp({ format: config.timestampFormat }),
-    prettyPrint(),
-    logFormater
-  ),
+  format: combine(errors({ stack: true }), colorize(), timestamp({ format: config.timestampFormat }), prettyPrint(), logFormater),
   transports: [
     new winstonDaily({
       datePattern: config.datePattern,

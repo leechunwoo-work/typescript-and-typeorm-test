@@ -5,11 +5,11 @@ export const create = async (category: string, context: string, experience: numb
   const info = {
     category,
     context,
-    experience: experience || 0,
+    experience: experience,
   };
 
   const todoRepository = AppDataSource.getRepository(Todo);
-  const todoInfo = await todoRepository.create(info);
+  const todoInfo = todoRepository.create(info);
   const result = await todoRepository.save(todoInfo);
 
   return result;

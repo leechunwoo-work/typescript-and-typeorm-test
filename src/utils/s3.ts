@@ -17,10 +17,7 @@ module.exports = {
    */
   upload: async (projectFilePath, uploadPath) => {
     // 제일 앞에 '/'를 삭제 하고 프로젝트 경로를 이어붙인다.
-    const absoluteFilePath = `${process.env.PWD}/${projectFilePath.replace(
-      /^\//,
-      ''
-    )}`;
+    const absoluteFilePath = `${process.env.PWD}/${projectFilePath.replace(/^\//, '')}`;
     // 파일 이름을 가져온다.
     const fileName = projectFilePath.match(/[^/]+$/)[0];
     const param = {
@@ -31,7 +28,7 @@ module.exports = {
     };
     s3.upload(param, err => {
       if (err) {
-        throw err
+        throw err;
       }
     });
   },
