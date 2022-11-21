@@ -1,7 +1,7 @@
 export const signUp = async (
-  nickname,
-  password,
-  email,
+  nickname: string | null = null,
+  password: string | null = null,
+  email: string | null = null,
   pushToken,
   authenticationType,
   isChallengeNotificationEnabled,

@@ -52,7 +52,15 @@ export const signUp = async (
       isUltrafineDustNotificationEnabled,
     } = req.body;
 
-    user.signUp();
+    user.signUp(
+      nickname,
+      password,
+      email,
+      pushToken,
+      authenticationType,
+      isChallengeNotificationEnabled,
+      isUltrafineDustNotificationEnabled
+    );
   } catch (error) {
     logger.error(error);
     res.status(500).json({

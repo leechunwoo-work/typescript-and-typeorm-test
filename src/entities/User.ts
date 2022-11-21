@@ -13,6 +13,8 @@ export class User extends DefaultEntity {
   @Column({ length: 163, nullable: true, unique: true })
   notificationToken: string;
 
+  @Column({ unique: true }) authenticationToken: string;
+
   @Column() authenticationStatus: number;
 
   @Column() authenticationType: number;
