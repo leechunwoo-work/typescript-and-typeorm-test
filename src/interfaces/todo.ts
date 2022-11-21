@@ -1,7 +1,5 @@
-export interface item {
+export interface createTodo {
   category: string;
   context: string;
   experience: number;
-  createdAt: Date;
-  isComplete: boolean;
 }

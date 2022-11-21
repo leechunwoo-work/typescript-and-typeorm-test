@@ -3,11 +3,7 @@ import logger from '../utils/winston';
 import Ajv from 'ajv';
 import { user } from '../models';
 
-export const signUp = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const signUp = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const ajv = new Ajv({ useDefaults: false });
     const requestSchema = {
