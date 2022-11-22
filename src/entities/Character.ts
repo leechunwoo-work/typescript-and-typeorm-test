@@ -5,10 +5,10 @@ import { User } from './User';
 @Entity()
 export class Character extends DefaultEntity {
   // 누적 경험치
-  @Column({ default: 0 }) experience: number;
+  @Column('int', { default: 0 }) experience: number;
 
   // 캐릭터 종류 (미정)
-  @Column() type: number;
+  @Column('int') type: number;
 
   @ManyToOne(() => User, user => user.characters, { nullable: false })
   user: User;
