@@ -1,5 +1,5 @@
 import { User } from '../entities';
-import { AppDataSource } from '../migrations/data-source';
+import { AppDataSource } from '../data-source';
 
 export const signUp = async ({
   email = null,

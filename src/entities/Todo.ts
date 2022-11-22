@@ -17,4 +17,7 @@ export class Todo extends DefaultEntity {
 
   // 완료 여부
   @Column('boolean', { default: false }) isCompleted: boolean;
+
+  // 추천 여부
+  @Column('boolean', { default: false }) isRecommended: boolean;
 }

@@ -1,4 +1,4 @@
-import { AppDataSource } from '../migrations/data-source';
+import { AppDataSource } from '../data-source';
 import { Todo } from '../entities';
 import { TodoInfo } from '../interfaces';
 
@@ -12,7 +12,7 @@ export const create = async (category: string, context: string) => {
   return result;
 };
 
-export const update = async (id: number, category: string, context: string) => {
+export const update = async (id: number, userId: number, category: string, context: string) => {
   const todoRepository = AppDataSource.getRepository(Todo);
   const todo: {
     id: number;
