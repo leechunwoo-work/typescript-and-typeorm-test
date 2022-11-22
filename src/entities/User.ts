@@ -5,7 +5,7 @@ import { Todo, Character, Bookmark, Notification } from './';
 @Entity()
 export class User extends DefaultEntity {
   // 일반 로그인에서 아이디 대신할 컬럼, 소셜 로그인은 없다.
-  @Column('varchar') email?: string | null;
+  @Column('varchar', { nullable: true }) email?: string | null;
 
   // 일반 로그인을 위한 컬럼, 소셜 로그인은 없다.
   @Column('varchar', { length: 64, nullable: true }) password?: string | null;

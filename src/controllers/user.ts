@@ -19,7 +19,6 @@ export const signUp = async (req: Request, res: Response, next: NextFunction) =>
       properties: {
         email: {
           type: 'string',
-          allOf: [{ format: 'email' }, { text: ['lowercase', 'trim'] }],
         },
         nickname: { type: 'string' },
         password: { type: 'string' },
@@ -38,6 +37,11 @@ export const signUp = async (req: Request, res: Response, next: NextFunction) =>
     }
 
     user.signUp(req.body);
+
+    res.status(200).json({
+      message: '회원가입에 성공했습니다.',
+      data: null,
+    });
   } catch (error) {
     logger.error(error);
     res.status(500).json({
