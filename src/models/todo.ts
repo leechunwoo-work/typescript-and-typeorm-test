@@ -1,6 +1,6 @@
 import { AppDataSource } from '../migrations/data-source';
 import { Todo } from '../entities';
-import { TodoInfo } from '../interfaces/todo';
+import { TodoInfo } from '../interfaces';
 
 export const create = async (category: string, context: string) => {
   const todo = new Todo();

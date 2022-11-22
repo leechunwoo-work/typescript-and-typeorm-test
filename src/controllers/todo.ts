@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import Ajv from 'ajv';
-import logger from '../utils/winston';
+import logger from '../utils';
 import { todo } from '../models';
 import { undefinedError, fixAjvError } from '../errors';
 

@@ -7,7 +7,7 @@ import morgan from 'morgan';
 
 import { Error } from './interfaces/error';
 import routes from './routes';
-import { logger } from './utils';
+import logger from './utils';
 
 AppDataSource.initialize()
   .then(() => {

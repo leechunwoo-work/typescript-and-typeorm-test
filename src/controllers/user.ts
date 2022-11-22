@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import logger from '../utils/winston';
+import logger from '../utils';
 import Ajv from 'ajv';
 import { user } from '../models';
 

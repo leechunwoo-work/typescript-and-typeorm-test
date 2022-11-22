@@ -1,2 +1,2 @@
 export { Error } from './error';
-export * as Todo from './todo';
+export { TodoInfo } from './todo';

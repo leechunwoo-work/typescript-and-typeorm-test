@@ -1,1 +1,1 @@
-export * as logger from './winston';
+export { default } from './winston';
