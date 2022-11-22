@@ -9,21 +9,20 @@ export const signUp = async (req: Request, res: Response, next: NextFunction) =>
     const requestSchema = {
       type: 'object',
       required: [
-        'nickname',
-        'password',
         'email',
-        'pushToken',
-        'authenticationType',
+        'password',
+        'nickname',
+        'authenticationStatus',
         'isChallengeNotificationEnabled',
         'isUltrafineDustNotificationEnabled',
       ],
       properties: {
-        nickname: { type: 'string' },
-        password: { type: 'string' },
         email: {
           type: 'string',
           allOf: [{ format: 'email' }, { text: ['lowercase', 'trim'] }],
         },
+        nickname: { type: 'string' },
+        password: { type: 'string' },
         pushToken: { type: 'string' },
         isChallengeNotificationEnabled: { type: 'boolean' },
         isUltrafineDustNotificationEnabled: { type: 'boolean' },
@@ -38,25 +37,7 @@ export const signUp = async (req: Request, res: Response, next: NextFunction) =>
       });
     }
 
-    const {
-      nickname,
-      password,
-      email,
-      pushToken,
-      authenticationType,
-      isChallengeNotificationEnabled,
-      isUltrafineDustNotificationEnabled,
-    } = req.body;
-
-    user.signUp(
-      nickname,
-      password,
-      email,
-      pushToken,
-      authenticationType,
-      isChallengeNotificationEnabled,
-      isUltrafineDustNotificationEnabled
-    );
+    user.signUp(req.body);
   } catch (error) {
     logger.error(error);
     res.status(500).json({
