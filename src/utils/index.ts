@@ -1,2 +1,1 @@
-import logger from './winston';
-export { logger };
+export * as logger from './winston';
