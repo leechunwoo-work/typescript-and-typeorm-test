@@ -1,7 +1,39 @@
 import { Request, Response, NextFunction } from 'express';
+import { user } from '../models';
+import { duplicateEmail, duplicateNickname, fixAjvError, invalidSignInfo, noRequiredArguments, undefinedError } from '../errors';
+import { jwt } from '../utils';
 import logger from '../utils';
 import Ajv from 'ajv';
-import { user } from '../models';
+
+export const duplicateCheckBy = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const ajv = new Ajv({ useDefaults: false });
+    const requestSchema = {
+      type: 'object',
+      properties: {
+        email: { type: 'string' },
+        nickname: { type: 'string' },
+      },
+    };
+    const isValid = ajv.validate(requestSchema, req.query);
+
+    if (!isValid && ajv.errors) {
+      return next(fixAjvError(ajv.errors));
+    }
+
+    if (!req.query.nickname && !req.query.email) {
+      return next(noRequiredArguments);
+    }
+
+    return res.status(200).json({
+      message: '중복 확인을 완료 했습니다.',
+      data: await user.duplicateCheckBy({ email: req.body.email }),
+    });
+  } catch (error) {
+    logger.error(error);
+    return next(undefinedError);
+  }
+};
 
 export const signUp = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -29,24 +61,69 @@ export const signUp = async (req: Request, res: Response, next: NextFunction) =>
     };
     const isValid = ajv.validate(requestSchema, req.body);
 
-    if (!isValid) {
-      res.status(400).json({
-        message: ajv.errorsText(),
-        data: null,
-      });
+    if (!isValid && ajv.errors) {
+      return next(fixAjvError(ajv.errors));
     }
 
-    user.signUp(req.body);
+    if (await user.duplicateCheckBy({ email: req.body.email })) {
+      return next(duplicateEmail);
+    }
 
-    res.status(200).json({
+    if (await user.duplicateCheckBy({ nickname: req.body.nickname })) {
+      return next(duplicateNickname);
+    }
+
+    const newUserInfo = await user.signUp(req.body);
+
+    delete newUserInfo!.password;
+
+    return res.status(200).json({
       message: '회원가입에 성공했습니다.',
-      data: null,
+      data: {
+        accessToken: jwt.generateAccessToken(newUserInfo),
+        refreshToken: jwt.generateRefreshToken(newUserInfo),
+      },
     });
   } catch (error) {
     logger.error(error);
-    res.status(500).json({
-      message: error.message,
-      data: null,
+    return next(undefinedError);
+  }
+};
+
+export const signIn = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const ajv = new Ajv({ useDefaults: false });
+    const requestSchema = {
+      type: 'object',
+      required: ['email', 'password'],
+      properties: {
+        email: { type: 'string' },
+        password: { type: 'string' },
+      },
+    };
+    const isValid = ajv.validate(requestSchema, req.body);
+
+    if (!isValid && ajv.errors) {
+      return next(fixAjvError(ajv.errors));
+    }
+
+    if (!(await user.isInformationCorrect(req.body.email, req.body.password))) {
+      return next(invalidSignInfo);
+    }
+
+    const userInfo = await user.get(req.body.email, req.body.password);
+
+    delete userInfo!.password;
+
+    return res.status(200).json({
+      message: '로그인에 성공했습니다.',
+      data: {
+        accessToken: jwt.generateAccessToken(userInfo),
+        refreshToken: jwt.generateRefreshToken(userInfo),
+      },
     });
+  } catch (error) {
+    logger.error(error);
+    return next(undefinedError);
   }
 };
