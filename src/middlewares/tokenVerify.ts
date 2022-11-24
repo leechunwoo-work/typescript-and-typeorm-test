@@ -11,9 +11,9 @@ export default async (req, _, next: NextFunction) => {
       return next(notVerifyUser);
     }
 
-    // 관리자 토큰 인증
+    // 토큰 인증
     const token = req.headers.authorization.split(' ')[1];
-    req.tokenData = verify(token, JWT_KEY);
+    req.token = verify(token, JWT_KEY);
 
     next();
   } catch (error) {
