@@ -42,11 +42,11 @@ export const update = async (id: number, userId: number, category: string, conte
 };
 
 // 목록
-export const getList = async (page: number, limit: number, category: string) => {
+export const getList = async (page: number, limit: number, category?: string) => {
   const { offset } = new PaginationData(page, limit);
 
   const todoRepository = AppDataSource.getRepository(Todo);
-  const todo: TodoInfo[] = await todoRepository.findAndCount({
+  const [list, count] = await todoRepository.findAndCount({
     select: {
       id: true,
       category: true,
@@ -60,7 +60,10 @@ export const getList = async (page: number, limit: number, category: string) => 
     take: limit,
   });
 
-  console.log(todo);
+  return {
+    list,
+    count,
+  };
 };
 
 // 완료 처리

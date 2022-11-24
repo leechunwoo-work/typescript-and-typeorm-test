@@ -75,3 +75,89 @@ export const update = async (req: Request, res: Response, next: NextFunction) =>
     return next(undefinedError);
   }
 };
+
+export const complete = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id, isCompleted } = req.body;
+
+    const schema = {
+      type: 'object',
+      properties: {
+        id: { type: 'number' },
+        isCompleted: { type: 'boolean' },
+      },
+      required: ['id', 'isCompleted'],
+      additionalProperties: false,
+    };
+
+    const validate = ajv.compile(schema);
+
+    if (!validate(req.body) && validate.errors) {
+      return next(fixAjvError(validate.errors));
+    }
+
+    const completeTodo = await todo.complete(id, isCompleted);
+
+    if (!completeTodo) {
+      return next(notFoundTodo);
+    }
+
+    return res.status(201).send({
+      message: 'TODO를 완료하였습니다.',
+      data: completeTodo,
+    });
+  } catch (error) {
+    logger.error(error);
+    return next(undefinedError);
+  }
+};
+
+export const getList = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { page, limit } = req.query;
+
+    const schema = {
+      type: 'object',
+      properties: {
+        page: { type: 'string' },
+        limit: { type: 'string' },
+      },
+      required: ['page', 'limit'],
+      additionalProperties: false,
+    };
+
+    const validate = ajv.compile(schema);
+
+    if (!validate(req.query) && validate.errors) {
+      return next(fixAjvError(validate.errors));
+    }
+
+    const pageNo = parseInt((page as string) || '');
+    const limitNo = parseInt((limit as string) || '');
+
+    const getTodo = await todo.getList(pageNo, limitNo);
+
+    getTodo.list.map((el: TodoInfo) => {
+      el.isDeleted = !el.deletedAt;
+      delete el.deletedAt;
+
+      return el;
+    });
+
+    if (!getTodo.list.length) {
+      return res.status(200).send({
+        message: 'TODO 목록이 비어있습니다.',
+        data: [],
+      });
+    }
+
+    return res.status(201).send({
+      message: 'TODO목록 요청에 성공하였습니다.',
+      data: getTodo.list,
+      total: getTodo.count,
+    });
+  } catch (error) {
+    logger.error(error);
+    return next(undefinedError);
+  }
+};

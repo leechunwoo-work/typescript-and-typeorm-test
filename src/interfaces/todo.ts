@@ -4,8 +4,7 @@ interface TodoInfo {
   context: string;
   experience: number;
   createdAt: Date;
-  deletedAt: Date;
+  deletedAt?: Date;
   isCompleted: boolean;
+  isDeleted?: boolean;
 }
-
-interface TodoList extends Array<TodoInfo> { }

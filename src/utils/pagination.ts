@@ -1,6 +1,6 @@
 export class PaginationData {
-  page: number | 1;
-  limit: number | 10;
+  page = 1;
+  limit = 10;
 
   constructor(page: number, limit: number) {
     this.page = page;
