@@ -1,10 +1,11 @@
 import { verify } from 'jsonwebtoken';
 import { invalidToken, notVerifyUser } from '../errors';
 import logger from '../utils';
-import { Request, NextFunction } from 'express';
+import { NextFunction } from 'express';
+import { TokenData, VerifyRequest } from '../interfaces/verify';
 const JWT_KEY = process.env.JWT_KEY || '';
 
-export default async (req, _, next: NextFunction) => {
+export default async (req: VerifyRequest, _, next: NextFunction) => {
   // 토큰 인증 미들웨어
   try {
     if (!req.headers.authorization) {
@@ -13,7 +14,7 @@ export default async (req, _, next: NextFunction) => {
 
     // 토큰 인증
     const token = req.headers.authorization.split(' ')[1];
-    req.token = verify(token, JWT_KEY);
+    req.token = verify(token, JWT_KEY) as TokenData;
 
     next();
   } catch (error) {
