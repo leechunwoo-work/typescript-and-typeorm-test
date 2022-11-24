@@ -10,8 +10,4 @@ export class PaginationData {
   get offset(): number {
     return (this.page - 1) * this.limit;
   }
-
-  get totalPage(): number {
-    return Math.ceil(this.page / this.limit);
-  }
 }
