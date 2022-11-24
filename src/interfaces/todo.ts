@@ -1,4 +1,4 @@
-interface TodoInfo {
+export interface TodoInfo {
   id: number;
   category: string;
   context: string;

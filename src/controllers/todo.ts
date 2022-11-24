@@ -1,13 +1,21 @@
 import { Request, Response, NextFunction } from 'express';
+import { VerifyRequest } from '../interfaces';
 import Ajv from 'ajv';
 import logger from '../utils';
 import { todo } from '../models';
 import { undefinedError, fixAjvError, notFoundTodo } from '../errors';
+import { TodoInfo } from '../interfaces';
 
 const ajv = new Ajv({ useDefaults: false });
 
 export const create = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    const user = {
+      id: 16,
+    };
+
+    const userId = user.id;
+
     const { category, context } = req.body;
 
     const schema = {
@@ -26,7 +34,7 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
       return next(fixAjvError(validate.errors));
     }
 
-    const newTodo = await todo.create(category, context);
+    const newTodo = await todo.create(category, context, userId);
 
     return res.status(201).send({
       message: 'TODO가 추가되었습니다.',
@@ -112,8 +120,9 @@ export const complete = async (req: Request, res: Response, next: NextFunction) 
   }
 };
 
-export const getList = async (req: Request, res: Response, next: NextFunction) => {
+export const getList = async (req: VerifyRequest, res: Response, next: NextFunction) => {
   try {
+    const userId = req.token!.data.id;
     const { page, limit } = req.query;
 
     const schema = {
@@ -135,7 +144,7 @@ export const getList = async (req: Request, res: Response, next: NextFunction) =
     const pageNo = parseInt((page as string) || '');
     const limitNo = parseInt((limit as string) || '');
 
-    const getTodo = await todo.getList(pageNo, limitNo);
+    const getTodo = await todo.getList(userId, pageNo, limitNo, 'category');
 
     getTodo.list.map((el: TodoInfo) => {
       el.isDeleted = !el.deletedAt;
@@ -151,7 +160,7 @@ export const getList = async (req: Request, res: Response, next: NextFunction) =
       });
     }
 
-    return res.status(201).send({
+    return res.status(200).send({
       message: 'TODO목록 요청에 성공하였습니다.',
       data: getTodo.list,
       total: getTodo.count,
