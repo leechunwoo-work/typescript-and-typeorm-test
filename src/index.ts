@@ -46,7 +46,7 @@ app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
   return res.status(error.status).send({
     message: error.message,
     data: {
-      errorCode: error.code,
+      code: error.code,
     },
   });
 });
