@@ -17,17 +17,18 @@ export const duplicateCheckBy = async (req: Request, res: Response, next: NextFu
     };
     const isValid = ajv.validate(requestSchema, req.query);
 
-    if (!isValid && ajv.errors) {
-      return next(fixAjvError(ajv.errors));
+    if (!isValid) {
+      return next(fixAjvError(ajv.errors!));
     }
 
     if (!req.query.nickname && !req.query.email) {
       return next(noRequiredArguments);
     }
 
+    const key = req.query.nickname ? 'nickname' : 'email';
     return res.status(200).json({
       message: '중복 확인을 완료 했습니다.',
-      data: await user.duplicateCheckBy({ email: req.body.email }),
+      data: await user.duplicateCheckBy({ [key]: req.query[key]?.toString() }),
     });
   } catch (error) {
     logger.error(error);
@@ -103,15 +104,14 @@ export const signIn = async (req: Request, res: Response, next: NextFunction) =>
     };
     const isValid = ajv.validate(requestSchema, req.body);
 
-    if (!isValid && ajv.errors) {
-      return next(fixAjvError(ajv.errors));
-    }
-
-    if (!(await user.isInformationCorrect(req.body.email, req.body.password))) {
-      return next(invalidSignInfo);
+    if (!isValid) {
+      return next(fixAjvError(ajv.errors!));
     }
 
     const userInfo = await user.get(req.body.email, req.body.password);
+    if (!userInfo) {
+      return next(invalidSignInfo);
+    }
 
     delete userInfo!.password;
 
@@ -121,6 +121,19 @@ export const signIn = async (req: Request, res: Response, next: NextFunction) =>
         accessToken: jwt.generateAccessToken(userInfo),
         refreshToken: jwt.generateRefreshToken(userInfo),
       },
+    });
+  } catch (error) {
+    logger.error(error);
+    return next(undefinedError);
+  }
+};
+
+export const signOut = async (req: Request<never, never, never, never>, res: Response, next: NextFunction) => {
+  try {
+    user.signOut(req['tokenData'].id);
+    return res.status(200).json({
+      message: '회원 탈퇴를 성공했습니다.',
+      data: null,
     });
   } catch (error) {
     logger.error(error);

@@ -8,8 +8,8 @@ export const duplicateCheckBy = async ({ nickname, email }: { nickname?: string;
     throw Error('인자가 없습니다.');
   }
   const userTable = AppDataSource.manager.getRepository(User);
-  const key = nickname ? { nickname } : { email };
-  return await userTable.findOneBy(key);
+  const key = nickname ? { nickname, deletedAt: undefined } : { email, deletedAt: undefined };
+  return !!(await userTable.findOneBy(key));
 };
 
 export const signUp = async ({
@@ -60,12 +60,16 @@ export const get = async (email: string, password: string) => {
   return await UserTable.findOneBy({
     email,
     password: crypto.HmacSHA256(password, PASSWORD_KEY).toString(),
+    deletedAt: undefined,
   });
 };
 
-export const isInformationCorrect = async (email: string, password: string) => {
-  if (!email || !password) {
-    throw Error('user.isInformationCorrect에서 인자가 없는 것이 있습니다.');
+export const signOut = async id => {
+  const userTable = AppDataSource.manager.getRepository(User);
+  const targetUser = await userTable.findOneBy({ id });
+  if (!targetUser) {
+    return null;
   }
-  return !!(await get(email, password));
+  targetUser.deletedAt = new Date();
+  return await AppDataSource.manager.save(targetUser);
 };

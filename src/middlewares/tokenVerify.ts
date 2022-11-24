@@ -1,9 +1,10 @@
 import { verify } from 'jsonwebtoken';
 import { invalidToken, notVerifyUser } from '../errors';
 import logger from '../utils';
+import { Request, NextFunction } from 'express';
 const JWT_KEY = process.env.JWT_KEY || '';
 
-module.exports = async (req, _, next) => {
+export default async (req, _, next: NextFunction) => {
   // 토큰 인증 미들웨어
   try {
     if (!req.headers.authorization) {
