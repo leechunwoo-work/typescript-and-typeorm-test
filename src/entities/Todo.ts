@@ -1,5 +1,6 @@
-import { Entity, Column } from 'typeorm';
+import { Entity, Column, ManyToMany, JoinTable } from 'typeorm';
 import { DefaultEntity } from './Abstract';
+import { User } from './';
 
 @Entity()
 export class Todo extends DefaultEntity {
@@ -20,4 +21,7 @@ export class Todo extends DefaultEntity {
 
   // 추천 여부
   @Column('boolean', { default: false }) isRecommended: boolean;
+
+  // 하나의 Todo는 여러 유저를 가질 수 있다.
+  @ManyToMany(() => User, { cascade: true }) @JoinTable({ name: 'user_todo' }) users: User[];
 }

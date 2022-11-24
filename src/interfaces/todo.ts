@@ -1,9 +1,10 @@
-export interface TodoInfo {
+interface TodoInfo {
   id: number;
   category: string;
   context: string;
   experience: number;
-  createdAt: boolean;
-  deletedAt: boolean;
-  isComplete: boolean;
+  createdAt: Date;
+  deletedAt?: Date;
+  isCompleted: boolean;
+  isDeleted?: boolean;
 }
