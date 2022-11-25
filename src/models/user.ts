@@ -8,7 +8,7 @@ export const duplicateCheckBy = async ({ nickname, email }: { nickname?: string;
     throw Error('인자가 없습니다.');
   }
   const userTable = AppDataSource.manager.getRepository(User);
-  const key = nickname ? { nickname, deletedAt: undefined } : { email, deletedAt: undefined };
+  const key = nickname ? { nickname } : { email };
   return !!(await userTable.findOneBy(key));
 };
 
@@ -60,25 +60,14 @@ export const get = async (email: string, password: string) => {
   return await UserTable.findOneBy({
     email,
     password: crypto.HmacSHA256(password, PASSWORD_KEY).toString(),
-    deletedAt: undefined,
   });
 };
 
-export const signOut = async id => {
+export const update = async (id: number, newUserInfo) => {
   const userTable = AppDataSource.manager.getRepository(User);
   const targetUser = await userTable.findOneBy({ id });
   if (!targetUser) {
-    return null;
-  }
-  targetUser.deletedAt = new Date();
-  return await AppDataSource.manager.save(targetUser);
-};
-
-export const update = async (id, newUserInfo) => {
-  const userTable = AppDataSource.manager.getRepository(User);
-  const targetUser = await userTable.findOneBy({ id });
-  if (!targetUser) {
-    return null;
+    throw Error('회원 정보 수정에 실패 했습니다.');
   }
   if ('password' in newUserInfo) {
     targetUser.password = crypto.HmacSHA256(newUserInfo.password, PASSWORD_KEY).toString();
@@ -91,4 +80,8 @@ export const update = async (id, newUserInfo) => {
     targetUser[key] = newUserInfo[key];
   }
   return await AppDataSource.manager.save(targetUser);
+};
+
+export const withdrawal = async (id: number) => {
+  return await update(id, { deletedAt: new Date() });
 };

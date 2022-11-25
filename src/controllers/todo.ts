@@ -3,7 +3,7 @@ import { VerifyRequest } from '../interfaces';
 import Ajv from 'ajv';
 import logger, { parsing } from '../utils';
 import { todo } from '../models';
-import { undefinedError, fixAjvError, notFoundTodo } from '../errors';
+import httpError, { fixAjvError } from '../errors';
 import { TodoInfo, TodoResponseModel } from '../interfaces';
 
 const ajv = new Ajv({ useDefaults: false });
@@ -41,7 +41,7 @@ export const create = async (req: VerifyRequest, res: Response, next: NextFuncti
     });
   } catch (error) {
     logger.error(error);
-    return next(undefinedError);
+    return next(httpError.undefined);
   }
 };
 
@@ -70,7 +70,7 @@ export const update = async (req: VerifyRequest, res: Response, next: NextFuncti
 
     const updateTodo = await todo.update(id, userId, category, context);
 
-    if (!updateTodo) return next(notFoundTodo);
+    if (!updateTodo) return next(httpError.notFoundTodo);
 
     const parsingData: TodoResponseModel = parsing.todo(updateTodo);
 
@@ -80,7 +80,7 @@ export const update = async (req: VerifyRequest, res: Response, next: NextFuncti
     });
   } catch (error) {
     logger.error(error);
-    return next(undefinedError);
+    return next(httpError.undefined);
   }
 };
 
@@ -108,7 +108,7 @@ export const complete = async (req: VerifyRequest, res: Response, next: NextFunc
 
     const completeTodo = await todo.complete(id, userId, isCompleted);
 
-    if (!completeTodo) return next(notFoundTodo);
+    if (!completeTodo) return next(httpError.notFoundTodo);
 
     const parsingData: TodoResponseModel = parsing.todo(completeTodo);
 
@@ -118,7 +118,7 @@ export const complete = async (req: VerifyRequest, res: Response, next: NextFunc
     });
   } catch (error) {
     logger.error(error);
-    return next(undefinedError);
+    return next(httpError.undefined);
   }
 };
 
@@ -171,7 +171,7 @@ export const getList = async (req: VerifyRequest, res: Response, next: NextFunct
     });
   } catch (error) {
     logger.error(error);
-    return next(undefinedError);
+    return next(httpError.undefined);
   }
 };
 
@@ -200,7 +200,7 @@ export const remove = async (req: VerifyRequest, res: Response, next: NextFuncti
 
     const removeTodo = await todo.remove(parseInt(id as string), userId);
 
-    if (!removeTodo) return next(notFoundTodo);
+    if (!removeTodo) return next(httpError.notFoundTodo);
 
     const parsingData: TodoResponseModel = parsing.todo(removeTodo);
 
@@ -210,6 +210,6 @@ export const remove = async (req: VerifyRequest, res: Response, next: NextFuncti
     });
   } catch (error) {
     logger.error(error);
-    return next(undefinedError);
+    return next(httpError.undefined);
   }
 };
