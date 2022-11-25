@@ -1,5 +1,4 @@
-import { Response, NextFunction } from 'express';
-import { VerifyRequest } from '../interfaces';
+import { VerifyController } from '../interfaces';
 import Ajv from 'ajv';
 import logger, { parsing } from '../utils';
 import { todo } from '../models';
@@ -9,7 +8,7 @@ import { TodoInfo, TodoResponseModel } from '../interfaces';
 const ajv = new Ajv({ useDefaults: false });
 
 // 등록
-export const create = async (req: VerifyRequest, res: Response, next: NextFunction) => {
+export const create: VerifyController = async (req, res, next) => {
   try {
     const userId = req.token!.data.id;
 
@@ -46,7 +45,7 @@ export const create = async (req: VerifyRequest, res: Response, next: NextFuncti
 };
 
 // 수정
-export const update = async (req: VerifyRequest, res: Response, next: NextFunction) => {
+export const update: VerifyController = async (req, res, next) => {
   try {
     const { id, category, context } = req.body;
     const userId = req.token!.data.id;
@@ -85,7 +84,7 @@ export const update = async (req: VerifyRequest, res: Response, next: NextFuncti
 };
 
 // 완료하기
-export const complete = async (req: VerifyRequest, res: Response, next: NextFunction) => {
+export const complete: VerifyController = async (req, res, next) => {
   try {
     const userId = req.token!.data.id;
     const { id, isCompleted } = req.body;
@@ -123,7 +122,7 @@ export const complete = async (req: VerifyRequest, res: Response, next: NextFunc
 };
 
 // 목록
-export const getList = async (req: VerifyRequest, res: Response, next: NextFunction) => {
+export const getList: VerifyController = async (req, res, next) => {
   try {
     const userId = req.token!.data.id;
     const { page, limit, category } = req.query;
@@ -176,7 +175,7 @@ export const getList = async (req: VerifyRequest, res: Response, next: NextFunct
 };
 
 // 삭제
-export const remove = async (req: VerifyRequest, res: Response, next: NextFunction) => {
+export const remove: VerifyController = async (req, res, next) => {
   try {
     const userId = req.token!.data.id;
     const { id } = req.query;
