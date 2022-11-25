@@ -16,7 +16,7 @@ interface UserVerifyData {
   isUltrafineDustNotificationEnabled: boolean;
 }
 
-interface TokenData {
+export interface TokenData {
   data: UserVerifyData;
   iat: number;
   exp: number;

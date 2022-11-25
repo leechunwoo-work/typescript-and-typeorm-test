@@ -3,12 +3,12 @@ const JWT_KEY: Secret = process.env.JWT_KEY || '';
 
 export const generateAccessToken = data => {
   // accessToken 생성
-  return sign({ data }, JWT_KEY, { expiresIn: '24h' });
+  return sign({ data }, JWT_KEY);
 };
 
 export const generateRefreshToken = data => {
   // refreshToken 생성
-  return sign({ data }, JWT_KEY, { expiresIn: '24h' });
+  return sign({ data }, JWT_KEY);
 };
 
 export const checkRefreshToken = refreshToken => {

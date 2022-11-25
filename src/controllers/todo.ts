@@ -1,13 +1,18 @@
-import { Request, Response, NextFunction } from 'express';
+import { Response, NextFunction } from 'express';
+import { VerifyRequest } from '../interfaces';
 import Ajv from 'ajv';
-import logger from '../utils';
+import logger, { parsing } from '../utils';
 import { todo } from '../models';
 import { undefinedError, fixAjvError, notFoundTodo } from '../errors';
+import { TodoInfo, TodoResponseModel } from '../interfaces';
 
 const ajv = new Ajv({ useDefaults: false });
 
-export const create = async (req: Request, res: Response, next: NextFunction) => {
+// 등록
+export const create = async (req: VerifyRequest, res: Response, next: NextFunction) => {
   try {
+    const userId = req.token!.data.id;
+
     const { category, context } = req.body;
 
     const schema = {
@@ -26,11 +31,13 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
       return next(fixAjvError(validate.errors));
     }
 
-    const newTodo = await todo.create(category, context);
+    const newTodo = await todo.create(category, context, userId);
+
+    const parsingData: TodoResponseModel = parsing.todo(newTodo);
 
     return res.status(201).send({
       message: 'TODO가 추가되었습니다.',
-      data: newTodo,
+      data: parsingData,
     });
   } catch (error) {
     logger.error(error);
@@ -38,7 +45,8 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
   }
 };
 
-export const update = async (req: Request, res: Response, next: NextFunction) => {
+// 수정
+export const update = async (req: VerifyRequest, res: Response, next: NextFunction) => {
   try {
     const { id, userId, category, context } = req.body;
 
@@ -62,13 +70,13 @@ export const update = async (req: Request, res: Response, next: NextFunction) =>
 
     const updateTodo = await todo.update(id, userId, category, context);
 
-    if (!updateTodo) {
-      return next(notFoundTodo);
-    }
+    if (!updateTodo) return next(notFoundTodo);
+
+    const parsingData: TodoResponseModel = parsing.todo(updateTodo);
 
     return res.status(201).send({
       message: 'TODO가 수정되었습니다.',
-      data: updateTodo,
+      data: parsingData,
     });
   } catch (error) {
     logger.error(error);
@@ -76,8 +84,10 @@ export const update = async (req: Request, res: Response, next: NextFunction) =>
   }
 };
 
-export const complete = async (req: Request, res: Response, next: NextFunction) => {
+// 완료하기
+export const complete = async (req: VerifyRequest, res: Response, next: NextFunction) => {
   try {
+    const userId = req.token!.data.id;
     const { id, isCompleted } = req.body;
 
     const schema = {
@@ -96,15 +106,15 @@ export const complete = async (req: Request, res: Response, next: NextFunction) 
       return next(fixAjvError(validate.errors));
     }
 
-    const completeTodo = await todo.complete(id, isCompleted);
+    const completeTodo = await todo.complete(id, userId, isCompleted);
 
-    if (!completeTodo) {
-      return next(notFoundTodo);
-    }
+    if (!completeTodo) return next(notFoundTodo);
+
+    const parsingData: TodoResponseModel = parsing.todo(completeTodo);
 
     return res.status(201).send({
       message: 'TODO를 완료하였습니다.',
-      data: completeTodo,
+      data: parsingData,
     });
   } catch (error) {
     logger.error(error);
@@ -112,15 +122,18 @@ export const complete = async (req: Request, res: Response, next: NextFunction) 
   }
 };
 
-export const getList = async (req: Request, res: Response, next: NextFunction) => {
+// 목록
+export const getList = async (req: VerifyRequest, res: Response, next: NextFunction) => {
   try {
-    const { page, limit } = req.query;
+    const userId = req.token!.data.id;
+    const { page, limit, category } = req.query;
 
     const schema = {
       type: 'object',
       properties: {
         page: { type: 'string' },
         limit: { type: 'string' },
+        category: { type: 'string' },
       },
       required: ['page', 'limit'],
       additionalProperties: false,
@@ -135,10 +148,10 @@ export const getList = async (req: Request, res: Response, next: NextFunction) =
     const pageNo = parseInt((page as string) || '');
     const limitNo = parseInt((limit as string) || '');
 
-    const getTodo = await todo.getList(pageNo, limitNo);
+    const getTodo = await todo.getList(userId, pageNo, limitNo, (category as string) || '');
 
     getTodo.list.map((el: TodoInfo) => {
-      el.isDeleted = !el.deletedAt;
+      el.isDeleted = !!el.deletedAt;
       delete el.deletedAt;
 
       return el;
@@ -151,10 +164,49 @@ export const getList = async (req: Request, res: Response, next: NextFunction) =
       });
     }
 
-    return res.status(201).send({
+    return res.status(200).send({
       message: 'TODO목록 요청에 성공하였습니다.',
       data: getTodo.list,
       total: getTodo.count,
+    });
+  } catch (error) {
+    logger.error(error);
+    return next(undefinedError);
+  }
+};
+
+// 삭제
+export const remove = async (req: VerifyRequest, res: Response, next: NextFunction) => {
+  try {
+    const userId = req.token!.data.id;
+    const { id } = req.query;
+
+    const schema = {
+      type: 'object',
+      properties: {
+        id: { type: 'string' },
+      },
+      required: ['id'],
+      additionalProperties: false,
+    };
+
+    const validate = ajv.compile(schema);
+
+    if (!validate(req.query) && validate.errors) {
+      return next(fixAjvError(validate.errors));
+    }
+
+    if (!id) return;
+
+    const removeTodo = await todo.remove(parseInt(id as string), userId);
+
+    if (!removeTodo) return next(notFoundTodo);
+
+    const parsingData: TodoResponseModel = parsing.todo(removeTodo);
+
+    return res.status(200).send({
+      message: 'TODO가 삭제되었습니다.',
+      data: parsingData,
     });
   } catch (error) {
     logger.error(error);
