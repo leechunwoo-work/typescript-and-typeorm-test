@@ -11,9 +11,6 @@ export class Bookmark extends DefaultEntity {
   // 주소의 위도, 경도 (x, y)
   @Column({ type: 'point', spatialFeatureType: 'Point', srid: 4326 }) geoPoint: Geometry;
 
-  // 삭제 여부
-  @Column('boolean', { default: false }) isDeleted: boolean;
-
   @ManyToOne(() => User, user => user.bookmarks)
   user: User;
 }

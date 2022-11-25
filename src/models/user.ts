@@ -73,3 +73,22 @@ export const signOut = async id => {
   targetUser.deletedAt = new Date();
   return await AppDataSource.manager.save(targetUser);
 };
+
+export const update = async (id, newUserInfo) => {
+  const userTable = AppDataSource.manager.getRepository(User);
+  const targetUser = await userTable.findOneBy({ id });
+  if (!targetUser) {
+    return null;
+  }
+  if ('password' in newUserInfo) {
+    targetUser.password = crypto.HmacSHA256(newUserInfo.password, PASSWORD_KEY).toString();
+    return await AppDataSource.manager.save(targetUser);
+  }
+  for (const key in newUserInfo) {
+    if (!(key in targetUser)) {
+      throw Error(`user.update에서 User 스키마에 없는 컬럼 "${key}"(을)를 바꾸려고 했습니다.`);
+    }
+    targetUser[key] = newUserInfo[key];
+  }
+  return await AppDataSource.manager.save(targetUser);
+};
