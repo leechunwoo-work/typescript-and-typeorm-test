@@ -1,3 +1,3 @@
 export { Error } from './error';
-export { TodoInfo } from './todo';
+export { TodoInfo, TodoResponseModel } from './todo';
 export { VerifyRequest } from './verify';
