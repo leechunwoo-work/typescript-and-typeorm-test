@@ -1,6 +1,6 @@
-import { TodoInfo } from '../interfaces';
+import { TodoInfo, TodoResponseModel } from '../interfaces';
 
-export const todo = (todoInfo: TodoInfo) => {
+export const todo = (todoInfo: TodoInfo): TodoResponseModel => {
   return {
     id: todoInfo.id,
     createdAt: todoInfo.createdAt,

@@ -58,6 +58,7 @@ export const update = async (id: number, userId: number, category: string, conte
 
 // 완료하기
 export const complete = async (id: number, userId: number, isCompleted: boolean) => {
+  // TODO: 캐릭터 경험치 올리기
   const todoRepository = AppDataSource.getRepository(Todo);
   const todo = await todoRepository.findOne({
     select: {

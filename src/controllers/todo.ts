@@ -33,9 +33,9 @@ export const create = async (req: VerifyRequest, res: Response, next: NextFuncti
 
     const newTodo = await todo.create(category, context, userId);
 
-    const parsingData: TodoResponseModel = parsing.todo(newTodo);
+    const parsingData = parsing.todo(newTodo);
 
-    return res.status(201).send({
+    return res.status(201).json({
       message: 'TODO가 추가되었습니다.',
       data: parsingData,
     });
@@ -48,13 +48,13 @@ export const create = async (req: VerifyRequest, res: Response, next: NextFuncti
 // 수정
 export const update = async (req: VerifyRequest, res: Response, next: NextFunction) => {
   try {
-    const { id, userId, category, context } = req.body;
+    const { id, category, context } = req.body;
+    const userId = req.token!.data.id;
 
     const schema = {
       type: 'object',
       properties: {
         id: { type: 'number' },
-        userId: { type: 'number' },
         category: { type: 'string', minLength: 1 },
         context: { type: 'string', minLength: 1 },
       },
@@ -74,7 +74,7 @@ export const update = async (req: VerifyRequest, res: Response, next: NextFuncti
 
     const parsingData: TodoResponseModel = parsing.todo(updateTodo);
 
-    return res.status(201).send({
+    return res.status(201).json({
       message: 'TODO가 수정되었습니다.',
       data: parsingData,
     });
@@ -112,7 +112,7 @@ export const complete = async (req: VerifyRequest, res: Response, next: NextFunc
 
     const parsingData: TodoResponseModel = parsing.todo(completeTodo);
 
-    return res.status(201).send({
+    return res.status(201).json({
       message: 'TODO를 완료하였습니다.',
       data: parsingData,
     });
@@ -158,13 +158,13 @@ export const getList = async (req: VerifyRequest, res: Response, next: NextFunct
     });
 
     if (!getTodo.list.length) {
-      return res.status(200).send({
+      return res.status(200).json({
         message: 'TODO 목록이 비어있습니다.',
         data: [],
       });
     }
 
-    return res.status(200).send({
+    return res.status(200).json({
       message: 'TODO목록 요청에 성공하였습니다.',
       data: getTodo.list,
       total: getTodo.count,
@@ -202,9 +202,9 @@ export const remove = async (req: VerifyRequest, res: Response, next: NextFuncti
 
     if (!removeTodo) return next(notFoundTodo);
 
-    const parsingData: TodoResponseModel = parsing.todo(removeTodo);
+    const parsingData = parsing.todo(removeTodo);
 
-    return res.status(200).send({
+    return res.status(200).json({
       message: 'TODO가 삭제되었습니다.',
       data: parsingData,
     });
