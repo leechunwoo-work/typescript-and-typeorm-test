@@ -1,5 +1,5 @@
 import { verify } from 'jsonwebtoken';
-import { invalidToken, notVerifyUser } from '../errors';
+import httpError from '../errors';
 import logger from '../utils';
 import { NextFunction } from 'express';
 import { TokenData, VerifyRequest } from '../interfaces/verify';
@@ -9,7 +9,7 @@ export default async (req: VerifyRequest, _, next: NextFunction) => {
   // 토큰 인증 미들웨어
   try {
     if (!req.headers.authorization) {
-      return next(notVerifyUser);
+      return next(httpError.notVerifyUser);
     }
 
     // 토큰 인증
@@ -19,6 +19,6 @@ export default async (req: VerifyRequest, _, next: NextFunction) => {
     next();
   } catch (error) {
     logger.error(error);
-    next(invalidToken);
+    next(httpError.invalidToken);
   }
 };

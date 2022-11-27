@@ -1,10 +1,8 @@
 import { Controller, VerifyController } from '../interfaces';
 import { user } from '../models';
 import httpError, { fixAjvError } from '../errors';
-import { jwt } from '../utils';
-import logger from '../utils';
+import logger, { jwt } from '../utils';
 import Ajv from 'ajv';
-import { http } from 'winston';
 const ajv = new Ajv({ useDefaults: false });
 
 export const duplicateCheckBy: Controller = async (req, res, next) => {
