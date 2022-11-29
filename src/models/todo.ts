@@ -4,13 +4,7 @@ import { PaginationData } from '../utils/pagination';
 
 // 등록
 export const create = async (category: string, context: string, userId: number) => {
-  const userRepository = AppDataSource.getRepository(User);
-
-  const user = await userRepository.findOne({
-    where: {
-      id: userId,
-    },
-  });
+  const user = await AppDataSource.getRepository(User).findOneBy({ id: userId });
 
   const todo = new Todo();
   todo.category = category;

@@ -11,3 +11,7 @@ export const todo = (todoInfo: TodoInfo): TodoResponseModel => {
     isDeleted: !!todoInfo.deletedAt,
   };
 };
+
+// export const character = (characterInfo: CharacterInfo): CharacterResponseModel => {
+//   return {};
+// };

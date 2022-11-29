@@ -1,27 +1,25 @@
-import { Response, NextFunction } from 'express';
-import { VerifyRequest } from '../interfaces';
+import { VerifyController } from '../interfaces';
 import Ajv from 'ajv';
-import logger, { parsing } from '../utils';
-import { todo } from '../models';
-import { undefinedError, fixAjvError, notFoundTodo } from '../errors';
+import logger, { processing } from '../utils';
+import { character } from '../models';
+import httpError, { fixAjvError } from '../errors';
 import { TodoInfo, TodoResponseModel } from '../interfaces';
 
 const ajv = new Ajv({ useDefaults: false });
 
-// 선택하기
-export const create = async (req: VerifyRequest, res: Response, next: NextFunction) => {
+// 대표 캐릭터 선택
+export const select: VerifyController = async (req, res, next) => {
   try {
     const userId = req.token!.data.id;
 
-    const { category, context } = req.body;
+    const { characterId } = req.body;
 
     const schema = {
       type: 'object',
       properties: {
-        category: { type: 'string', minLength: 1 },
-        context: { type: 'string', minLength: 1 },
+        characterId: { type: 'number' },
       },
-      required: ['category', 'context'],
+      required: ['characterId'],
       additionalProperties: false,
     };
 
@@ -31,185 +29,106 @@ export const create = async (req: VerifyRequest, res: Response, next: NextFuncti
       return next(fixAjvError(validate.errors));
     }
 
-    const newTodo = await todo.create(category, context, userId);
+    const characterInfo = await character.select(userId, characterId);
 
-    const parsingData: TodoResponseModel = parsing.todo(newTodo);
+    // const processingData: TodoResponseModel = processing.todo(newTodo);
 
     return res.status(201).send({
-      message: 'TODO가 추가되었습니다.',
-      data: parsingData,
+      message: '캐릭터 선택이 완료되었습니다.',
+      data: characterInfo,
     });
   } catch (error) {
     logger.error(error);
-    return next(undefinedError);
+    return next(httpError.undefined);
+  }
+};
+
+// 대표 캐릭터 변경
+export const change: VerifyController = async (req, res, next) => {
+  try {
+  } catch (error) {
+    logger.error(error);
+    return next(httpError.undefined);
+  }
+};
+
+// 대표 캐릭터 조회
+export const find: VerifyController = async (req, res, next) => {
+  try {
+    const userId = req.token!.data.id;
+
+    const characterInfo = await character.find(userId);
+
+    return res.status(200).send({
+      data: characterInfo,
+    });
+  } catch (error) {
+    logger.error(error);
+    return next(httpError.undefined);
+  }
+};
+
+// 생성
+export const create: VerifyController = async (req, res, next) => {
+  try {
+    // TODO: 관리자인지 확인
+
+    const { type, name, levelMaxExperience } = req.body;
+
+    const schema = {
+      type: 'object',
+      properties: {
+        type: { type: 'number' },
+        name: { type: 'string' },
+        levelMaxExperience: { type: 'array' },
+      },
+      required: ['type', 'name', 'levelMaxExperience'],
+      additionalProperties: false,
+    };
+
+    const validate = ajv.compile(schema);
+
+    if (!validate(req.body) && validate.errors) {
+      return next(fixAjvError(validate.errors));
+    }
+
+    const characterInfo = await character.create(type, name, levelMaxExperience);
+
+    // const processingData: TodoResponseModel = processing.todo(newTodo);
+
+    return res.status(201).send({
+      message: '캐릭터 선택이 완료되었습니다.',
+      data: characterInfo,
+    });
+  } catch (error) {
+    logger.error(error);
+    return next(httpError.undefined);
   }
 };
 
 // 수정
-export const update = async (req: VerifyRequest, res: Response, next: NextFunction) => {
+export const update: VerifyController = async (req, res, next) => {
   try {
-    const { id, userId, category, context } = req.body;
-
-    const schema = {
-      type: 'object',
-      properties: {
-        id: { type: 'number' },
-        userId: { type: 'number' },
-        category: { type: 'string', minLength: 1 },
-        context: { type: 'string', minLength: 1 },
-      },
-      required: ['id', 'category', 'context'],
-      additionalProperties: false,
-    };
-
-    const validate = ajv.compile(schema);
-
-    if (!validate(req.body) && validate.errors) {
-      return next(fixAjvError(validate.errors));
-    }
-
-    const updateTodo = await todo.update(id, userId, category, context);
-
-    if (!updateTodo) return next(notFoundTodo);
-
-    const parsingData: TodoResponseModel = parsing.todo(updateTodo);
-
-    return res.status(201).send({
-      message: 'TODO가 수정되었습니다.',
-      data: parsingData,
-    });
   } catch (error) {
     logger.error(error);
-    return next(undefinedError);
-  }
-};
-
-// 완료하기
-export const complete = async (req: VerifyRequest, res: Response, next: NextFunction) => {
-  try {
-    const userId = req.token!.data.id;
-    const { id, isCompleted } = req.body;
-
-    const schema = {
-      type: 'object',
-      properties: {
-        id: { type: 'number' },
-        isCompleted: { type: 'boolean' },
-      },
-      required: ['id', 'isCompleted'],
-      additionalProperties: false,
-    };
-
-    const validate = ajv.compile(schema);
-
-    if (!validate(req.body) && validate.errors) {
-      return next(fixAjvError(validate.errors));
-    }
-
-    const completeTodo = await todo.complete(id, userId, isCompleted);
-
-    if (!completeTodo) return next(notFoundTodo);
-
-    const parsingData: TodoResponseModel = parsing.todo(completeTodo);
-
-    return res.status(201).send({
-      message: 'TODO를 완료하였습니다.',
-      data: parsingData,
-    });
-  } catch (error) {
-    logger.error(error);
-    return next(undefinedError);
+    return next(httpError.undefined);
   }
 };
 
 // 목록
-export const getList = async (req: VerifyRequest, res: Response, next: NextFunction) => {
+export const getList: VerifyController = async (req, res, next) => {
   try {
-    const userId = req.token!.data.id;
-    const { page, limit, category } = req.query;
-
-    const schema = {
-      type: 'object',
-      properties: {
-        page: { type: 'string' },
-        limit: { type: 'string' },
-        category: { type: 'string' },
-      },
-      required: ['page', 'limit'],
-      additionalProperties: false,
-    };
-
-    const validate = ajv.compile(schema);
-
-    if (!validate(req.query) && validate.errors) {
-      return next(fixAjvError(validate.errors));
-    }
-
-    const pageNo = parseInt((page as string) || '');
-    const limitNo = parseInt((limit as string) || '');
-
-    const getTodo = await todo.getList(userId, pageNo, limitNo, (category as string) || '');
-
-    getTodo.list.map((el: TodoInfo) => {
-      el.isDeleted = !!el.deletedAt;
-      delete el.deletedAt;
-
-      return el;
-    });
-
-    if (!getTodo.list.length) {
-      return res.status(200).send({
-        message: 'TODO 목록이 비어있습니다.',
-        data: [],
-      });
-    }
-
-    return res.status(200).send({
-      message: 'TODO목록 요청에 성공하였습니다.',
-      data: getTodo.list,
-      total: getTodo.count,
-    });
   } catch (error) {
     logger.error(error);
-    return next(undefinedError);
+    return next(httpError.undefined);
   }
 };
 
 // 삭제
-export const remove = async (req: VerifyRequest, res: Response, next: NextFunction) => {
+export const remove: VerifyController = async (req, res, next) => {
   try {
-    const userId = req.token!.data.id;
-    const { id } = req.query;
-
-    const schema = {
-      type: 'object',
-      properties: {
-        id: { type: 'string' },
-      },
-      required: ['id'],
-      additionalProperties: false,
-    };
-
-    const validate = ajv.compile(schema);
-
-    if (!validate(req.query) && validate.errors) {
-      return next(fixAjvError(validate.errors));
-    }
-
-    if (!id) return;
-
-    const removeTodo = await todo.remove(parseInt(id as string), userId);
-
-    if (!removeTodo) return next(notFoundTodo);
-
-    const parsingData: TodoResponseModel = parsing.todo(removeTodo);
-
-    return res.status(200).send({
-      message: 'TODO가 삭제되었습니다.',
-      data: parsingData,
-    });
   } catch (error) {
     logger.error(error);
-    return next(undefinedError);
+    return next(httpError.undefined);
   }
 };

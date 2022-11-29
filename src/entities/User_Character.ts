@@ -7,18 +7,22 @@ export class User_Character extends DefaultEntity {
   @PrimaryColumn()
   userId: number;
 
-  @ManyToOne(() => User, user => user.characters)
+  @ManyToOne(() => User, user => user.user_characters)
   @JoinColumn({ name: 'userId' })
   user: User;
 
   @PrimaryColumn()
   characterId: number;
 
-  @ManyToOne(() => Character, character => character.users)
+  @ManyToOne(() => Character, character => character.user_characters)
   @JoinColumn({ name: 'characterId' })
   character: Character;
 
   // 누적 경험치
-  @Column()
+  @Column('int', { default: 0 })
   experience: number;
+
+  // 대표 캐릭터 여부
+  @Column('boolean', { default: false })
+  isRepresent: boolean;
 }

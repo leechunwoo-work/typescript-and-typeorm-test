@@ -1,6 +1,6 @@
 import { VerifyController } from '../interfaces';
 import Ajv from 'ajv';
-import logger, { parsing } from '../utils';
+import logger, { processing } from '../utils';
 import { todo } from '../models';
 import httpError, { fixAjvError } from '../errors';
 import { TodoInfo, TodoResponseModel } from '../interfaces';
@@ -32,11 +32,11 @@ export const create: VerifyController = async (req, res, next) => {
 
     const newTodo = await todo.create(category, context, userId);
 
-    const parsingData = parsing.todo(newTodo);
+    const processingData = processing.todo(newTodo);
 
     return res.status(201).json({
       message: 'TODO가 추가되었습니다.',
-      data: parsingData,
+      data: processingData,
     });
   } catch (error) {
     logger.error(error);
@@ -71,11 +71,11 @@ export const update: VerifyController = async (req, res, next) => {
 
     if (!updateTodo) return next(httpError.notFoundTodo);
 
-    const parsingData: TodoResponseModel = parsing.todo(updateTodo);
+    const processingData: TodoResponseModel = processing.todo(updateTodo);
 
     return res.status(201).json({
       message: 'TODO가 수정되었습니다.',
-      data: parsingData,
+      data: processingData,
     });
   } catch (error) {
     logger.error(error);
@@ -109,11 +109,11 @@ export const complete: VerifyController = async (req, res, next) => {
 
     if (!completeTodo) return next(httpError.notFoundTodo);
 
-    const parsingData: TodoResponseModel = parsing.todo(completeTodo);
+    const processingData: TodoResponseModel = processing.todo(completeTodo);
 
     return res.status(201).json({
       message: 'TODO를 완료하였습니다.',
-      data: parsingData,
+      data: processingData,
     });
   } catch (error) {
     logger.error(error);
@@ -201,11 +201,11 @@ export const remove: VerifyController = async (req, res, next) => {
 
     if (!removeTodo) return next(httpError.notFoundTodo);
 
-    const parsingData = parsing.todo(removeTodo);
+    const processingData = processing.todo(removeTodo);
 
     return res.status(200).json({
       message: 'TODO가 삭제되었습니다.',
-      data: parsingData,
+      data: processingData,
     });
   } catch (error) {
     logger.error(error);
