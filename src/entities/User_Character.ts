@@ -18,6 +18,7 @@ export class User_Character extends DefaultEntity {
   @JoinColumn({ name: 'characterId' })
   character: Character;
 
+  // 누적 경험치
   @Column()
   experience: number;
 }
