@@ -1,12 +1,13 @@
 import { ErrorObject } from 'ajv';
 
+// 400 Error
 export const fixAjvError = (errors: ErrorObject[]) => {
   switch (errors[0].keyword) {
     case 'required':
       return {
-        status: 404,
+        status: 400,
         message: `${errors[0].params.missingProperty}(이)가 입력되지 않았습니다.`,
-        code: 'ERR404100',
+        code: 'ERR400100',
       };
 
     case 'maxLength':
@@ -14,14 +15,14 @@ export const fixAjvError = (errors: ErrorObject[]) => {
       return {
         status: 400,
         message: `${errors[0].instancePath.replace('/', '')}의 길이를 확인해주세요.`,
-        code: 'ERR400100',
+        code: 'ERR400101',
       };
 
     case 'type':
       return {
         status: 400,
         message: `${errors[0].instancePath.replace('/', '')}은(는) ${errors[0].params.type}(으)로 보내주셔야합니다.`,
-        code: 'ERR400101',
+        code: 'ERR400102',
       };
 
     default:

@@ -1,14 +1,15 @@
-import { VerifyController } from '../interfaces';
+import { Response, NextFunction } from 'express';
+import { VerifyRequest } from '../interfaces';
 import Ajv from 'ajv';
 import logger, { parsing } from '../utils';
 import { todo } from '../models';
-import httpError, { fixAjvError } from '../errors';
+import { undefinedError, fixAjvError, notFoundTodo } from '../errors';
 import { TodoInfo, TodoResponseModel } from '../interfaces';
 
 const ajv = new Ajv({ useDefaults: false });
 
-// 등록
-export const create: VerifyController = async (req, res, next) => {
+// 선택하기
+export const create = async (req: VerifyRequest, res: Response, next: NextFunction) => {
   try {
     const userId = req.token!.data.id;
 
@@ -32,28 +33,28 @@ export const create: VerifyController = async (req, res, next) => {
 
     const newTodo = await todo.create(category, context, userId);
 
-    const parsingData = parsing.todo(newTodo);
+    const parsingData: TodoResponseModel = parsing.todo(newTodo);
 
-    return res.status(201).json({
+    return res.status(201).send({
       message: 'TODO가 추가되었습니다.',
       data: parsingData,
     });
   } catch (error) {
     logger.error(error);
-    return next(httpError.undefined);
+    return next(undefinedError);
   }
 };
 
 // 수정
-export const update: VerifyController = async (req, res, next) => {
+export const update = async (req: VerifyRequest, res: Response, next: NextFunction) => {
   try {
-    const { id, category, context } = req.body;
-    const userId = req.token!.data.id;
+    const { id, userId, category, context } = req.body;
 
     const schema = {
       type: 'object',
       properties: {
         id: { type: 'number' },
+        userId: { type: 'number' },
         category: { type: 'string', minLength: 1 },
         context: { type: 'string', minLength: 1 },
       },
@@ -69,22 +70,22 @@ export const update: VerifyController = async (req, res, next) => {
 
     const updateTodo = await todo.update(id, userId, category, context);
 
-    if (!updateTodo) return next(httpError.notFoundTodo);
+    if (!updateTodo) return next(notFoundTodo);
 
     const parsingData: TodoResponseModel = parsing.todo(updateTodo);
 
-    return res.status(201).json({
+    return res.status(201).send({
       message: 'TODO가 수정되었습니다.',
       data: parsingData,
     });
   } catch (error) {
     logger.error(error);
-    return next(httpError.undefined);
+    return next(undefinedError);
   }
 };
 
 // 완료하기
-export const complete: VerifyController = async (req, res, next) => {
+export const complete = async (req: VerifyRequest, res: Response, next: NextFunction) => {
   try {
     const userId = req.token!.data.id;
     const { id, isCompleted } = req.body;
@@ -107,22 +108,22 @@ export const complete: VerifyController = async (req, res, next) => {
 
     const completeTodo = await todo.complete(id, userId, isCompleted);
 
-    if (!completeTodo) return next(httpError.notFoundTodo);
+    if (!completeTodo) return next(notFoundTodo);
 
     const parsingData: TodoResponseModel = parsing.todo(completeTodo);
 
-    return res.status(201).json({
+    return res.status(201).send({
       message: 'TODO를 완료하였습니다.',
       data: parsingData,
     });
   } catch (error) {
     logger.error(error);
-    return next(httpError.undefined);
+    return next(undefinedError);
   }
 };
 
 // 목록
-export const getList: VerifyController = async (req, res, next) => {
+export const getList = async (req: VerifyRequest, res: Response, next: NextFunction) => {
   try {
     const userId = req.token!.data.id;
     const { page, limit, category } = req.query;
@@ -157,25 +158,25 @@ export const getList: VerifyController = async (req, res, next) => {
     });
 
     if (!getTodo.list.length) {
-      return res.status(200).json({
+      return res.status(200).send({
         message: 'TODO 목록이 비어있습니다.',
         data: [],
       });
     }
 
-    return res.status(200).json({
+    return res.status(200).send({
       message: 'TODO목록 요청에 성공하였습니다.',
       data: getTodo.list,
       total: getTodo.count,
     });
   } catch (error) {
     logger.error(error);
-    return next(httpError.undefined);
+    return next(undefinedError);
   }
 };
 
 // 삭제
-export const remove: VerifyController = async (req, res, next) => {
+export const remove = async (req: VerifyRequest, res: Response, next: NextFunction) => {
   try {
     const userId = req.token!.data.id;
     const { id } = req.query;
@@ -199,16 +200,16 @@ export const remove: VerifyController = async (req, res, next) => {
 
     const removeTodo = await todo.remove(parseInt(id as string), userId);
 
-    if (!removeTodo) return next(httpError.notFoundTodo);
+    if (!removeTodo) return next(notFoundTodo);
 
-    const parsingData = parsing.todo(removeTodo);
+    const parsingData: TodoResponseModel = parsing.todo(removeTodo);
 
-    return res.status(200).json({
+    return res.status(200).send({
       message: 'TODO가 삭제되었습니다.',
       data: parsingData,
     });
   } catch (error) {
     logger.error(error);
-    return next(httpError.undefined);
+    return next(undefinedError);
   }
 };

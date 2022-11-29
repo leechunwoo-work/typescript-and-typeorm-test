@@ -23,5 +23,5 @@ export class Todo extends DefaultEntity {
   @Column('boolean', { default: false }) isRecommended: boolean;
 
   // 하나의 Todo는 여러 유저를 가질 수 있다.
-  @ManyToMany(() => User, { cascade: true }) @JoinTable({ name: 'user_todo' }) users: User[];
+  @ManyToMany(() => User) @JoinTable({ name: 'user_todo' }) users: User[];
 }

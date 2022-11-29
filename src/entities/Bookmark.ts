@@ -8,6 +8,9 @@ export class Bookmark extends DefaultEntity {
   // 제목
   @Column('varchar') title: string;
 
+  // 주소
+  @Column('varchar') address: string;
+
   // 주소의 위도, 경도 (x, y)
   @Column({
     type: 'point',

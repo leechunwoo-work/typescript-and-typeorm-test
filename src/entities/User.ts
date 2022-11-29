@@ -1,6 +1,6 @@
 import { Entity, Column, OneToMany, ManyToMany, JoinTable } from 'typeorm';
 import { DefaultEntity } from './Abstract';
-import { Todo, Character, Bookmark, Notification } from './';
+import { Todo, User_Character, Bookmark, Notification } from './';
 
 @Entity()
 export class User extends DefaultEntity {
@@ -37,15 +37,15 @@ export class User extends DefaultEntity {
   // 초미세 먼지 알림을 보낼지 여부를 확인하기 위해 필요
   @Column('boolean', { default: true }) isUltrafineDustNotificationEnabled: boolean;
 
-  // 1:n 하나의 유저는 여러 캐릭터를 가질 수 있다.
-  @OneToMany(() => Character, character => character.user) characters: Character[];
-
   // 1:n 하나의 유저는 여러 즐겨찾기 항목을 가질 수 있다.
   @OneToMany(() => Bookmark, bookmark => bookmark.user) bookmarks: Bookmark[];
 
   // 1:n 하나의 유저는 여러 알림 메시지를 가질 수 있다.
   @OneToMany(() => Notification, notification => notification.user) notifications: Notification[];
 
-  // n:m 하나의 유저는 여러 챌린지(todo)를 가질 수 있고, 하나의 챌린지는 여러 유저를 가질수 있다.
-  @ManyToMany(() => Todo, { cascade: true }) @JoinTable({ name: 'user_todo' }) todos: Todo[];
+  // n:m 하나의 유저는 여러 캐릭터를 가질 수 있고, 하나의 캐릭터는 여러 유저를 가질 수 있다.
+  @OneToMany(() => User_Character, user_character => user_character.user) characters: User_Character[];
+
+  // n:m 하나의 유저는 여러 챌린지(todo)를 가질 수 있고, 하나의 챌린지는 여러 유저를 가질 수 있다.
+  @ManyToMany(() => Todo) @JoinTable({ name: 'user_todo' }) todos: Todo[];
 }
