@@ -1,14 +1,12 @@
-import { Request, Response, NextFunction } from 'express';
+import { Controller, VerifyController } from '../interfaces';
 import { user } from '../models';
-import { duplicateEmail, duplicateNickname, fixAjvError, invalidSignInfo, noRequiredArguments, undefinedError } from '../errors';
-import { jwt } from '../utils';
-import { VerifyRequest } from '../interfaces';
-import logger from '../utils';
+import httpError, { fixAjvError } from '../errors';
+import logger, { jwt } from '../utils';
 import Ajv from 'ajv';
+const ajv = new Ajv({ useDefaults: false });
 
-export const duplicateCheckBy = async (req: Request, res: Response, next: NextFunction) => {
+export const duplicateCheckBy: Controller = async (req, res, next) => {
   try {
-    const ajv = new Ajv({ useDefaults: false });
     const requestSchema = {
       type: 'object',
       properties: {
@@ -23,7 +21,7 @@ export const duplicateCheckBy = async (req: Request, res: Response, next: NextFu
     }
 
     if (!req.query.nickname && !req.query.email) {
-      return next(noRequiredArguments);
+      return next(httpError.noRequiredArguments);
     }
 
     const key = req.query.nickname ? 'nickname' : 'email';
@@ -33,13 +31,12 @@ export const duplicateCheckBy = async (req: Request, res: Response, next: NextFu
     });
   } catch (error) {
     logger.error(error);
-    return next(undefinedError);
+    return next(httpError.undefined);
   }
 };
 
-export const signUp = async (req: Request, res: Response, next: NextFunction) => {
+export const signUp: Controller = async (req, res, next) => {
   try {
-    const ajv = new Ajv({ useDefaults: false });
     const requestSchema = {
       type: 'object',
       required: [
@@ -68,11 +65,11 @@ export const signUp = async (req: Request, res: Response, next: NextFunction) =>
     }
 
     if (await user.duplicateCheckBy({ email: req.body.email })) {
-      return next(duplicateEmail);
+      return next(httpError.duplicateEmail);
     }
 
     if (await user.duplicateCheckBy({ nickname: req.body.nickname })) {
-      return next(duplicateNickname);
+      return next(httpError.duplicateNickname);
     }
 
     const newUserInfo = await user.signUp(req.body);
@@ -88,13 +85,12 @@ export const signUp = async (req: Request, res: Response, next: NextFunction) =>
     });
   } catch (error) {
     logger.error(error);
-    return next(undefinedError);
+    return next(httpError.undefined);
   }
 };
 
-export const signIn = async (req: Request, res: Response, next: NextFunction) => {
+export const signIn: VerifyController = async (req, res, next) => {
   try {
-    const ajv = new Ajv({ useDefaults: false });
     const requestSchema = {
       type: 'object',
       required: ['email', 'password'],
@@ -111,7 +107,7 @@ export const signIn = async (req: Request, res: Response, next: NextFunction) =>
 
     const userInfo = await user.get(req.body.email, req.body.password);
     if (!userInfo) {
-      return next(invalidSignInfo);
+      return next(httpError.invalidSignInfo);
     }
 
     delete userInfo!.password;
@@ -125,26 +121,27 @@ export const signIn = async (req: Request, res: Response, next: NextFunction) =>
     });
   } catch (error) {
     logger.error(error);
-    return next(undefinedError);
+    return next(httpError.undefined);
   }
 };
 
-export const signOut = async (req: VerifyRequest, res: Response, next: NextFunction) => {
+export const withdrawal: VerifyController = async (req, res, next) => {
   try {
-    user.signOut(req.token!.data.id);
+    if (!(await user.withdrawal(req.token!.data.id))) {
+      throw Error('회원 탈퇴를 실패했습니다.');
+    }
     return res.status(200).json({
       message: '회원 탈퇴를 성공했습니다.',
       data: null,
     });
   } catch (error) {
     logger.error(error);
-    return next(undefinedError);
+    return next(httpError.undefined);
   }
 };
 
-export const update = async (req: VerifyRequest, res: Response, next: NextFunction) => {
+export const update: VerifyController = async (req, res, next) => {
   try {
-    const ajv = new Ajv({ useDefaults: false });
     const requestSchema = {
       type: 'object',
       properties: {
@@ -161,12 +158,12 @@ export const update = async (req: VerifyRequest, res: Response, next: NextFuncti
     }
     const updatedUserData = await user.update(req.token!.data.id, req.body);
     delete updatedUserData?.password;
-    res.status(200).json({
+    res.status(201).json({
       message: '회원 정보 수정에 성공했습니다.',
       data: updatedUserData,
     });
   } catch (error) {
     logger.error(error);
-    return next(undefinedError);
+    return next(httpError.undefined);
   }
 };
