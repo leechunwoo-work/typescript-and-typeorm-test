@@ -19,7 +19,7 @@ export class Bookmark extends DefaultEntity {
     nullable: true,
     transformer: {
       from: p => p,
-      to: p => `${p.coordinates[0]},${p.coordinates[1]}`,
+      to: p => ('coordinates' in p ? `${p.coordinates[0]},${p.coordinates[1]}` : `${p.x},${p.y}`),
     },
   })
   geoPoint: Point;

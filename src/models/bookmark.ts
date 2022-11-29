@@ -3,10 +3,11 @@ import { User } from '../entities';
 import { AppDataSource } from '../data-source';
 import { PaginationData } from '../utils/pagination';
 
-export const create = async (userId: number, title: string, x: number, y: number) => {
+export const create = async (userId: number, title: string, address: string, x: number, y: number) => {
   const user = await AppDataSource.getRepository(User).findOneBy({ id: userId });
   const bookmark = new Bookmark();
   bookmark.title = title;
+  bookmark.address = address;
   bookmark.geoPoint = { type: 'Point', coordinates: [x, y] };
   if (!user) {
     throw Error(`없는 유저(id: ${userId})에 북마크를 추가하려 했습니다.`);
@@ -40,7 +41,7 @@ export const getList = async (userId: number, page: number, limit: number) => {
   };
 };
 
-export const update = async (userId: number, bookmarkId: number, title?: string, x?: number, y?: number) => {
+export const update = async (userId: number, bookmarkId: number, title: string, address: string, x = 0, y = 0) => {
   const userBookmark = AppDataSource.manager.getRepository(Bookmark);
   const targetBookmark = await userBookmark.findOne({
     relations: { user: true },
@@ -59,10 +60,9 @@ export const update = async (userId: number, bookmarkId: number, title?: string,
   if (!targetBookmark) {
     throw Error('없는 북마크를 수정 하려고 했습니다. 북마크 수정에 실패 했습니다.');
   }
-
-  targetBookmark.title = title ? title : targetBookmark.title;
-  targetBookmark.geoPoint.coordinates[0] = x ? x : targetBookmark.geoPoint.coordinates[0];
-  targetBookmark.geoPoint.coordinates[1] = y ? y : targetBookmark.geoPoint.coordinates[1];
+  targetBookmark.title = title;
+  targetBookmark.address = address;
+  targetBookmark.geoPoint = { type: 'Point', coordinates: [x, y] };
   return await AppDataSource.manager.save(targetBookmark);
 };
 

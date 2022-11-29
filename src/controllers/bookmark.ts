@@ -9,9 +9,10 @@ export const create: VerifyController = async (req, res, next) => {
   try {
     const requestSchema = {
       type: 'object',
-      required: ['title', 'x', 'y'],
+      required: ['title', 'address', 'x', 'y'],
       properties: {
         title: { type: 'string', minLength: 1 },
+        address: { type: 'string', minLength: 1 },
         x: { type: 'number' },
         y: { type: 'number' },
       },
@@ -21,9 +22,9 @@ export const create: VerifyController = async (req, res, next) => {
     if (!isValid) {
       return next(fixAjvError(ajv.errors!));
     }
-    const { title, x, y } = req.body;
+    const { title, address, x, y } = req.body;
     const userId = req.token!.data.id;
-    const { id } = await bookmark.create(userId, title, x, y);
+    const { id } = await bookmark.create(userId, title, address, x, y);
     return res.status(200).json({
       message: '북마크 생성에 성공했습니다.',
       data: id,
@@ -79,8 +80,9 @@ export const update: VerifyController = async (req, res, next) => {
     if (!isValid) {
       return next(fixAjvError(ajv.errors!));
     }
+    const { title, address, x, y } = req.body;
     const userId = req.token!.data.id;
-    const updatedBookmarkData = await bookmark.update(userId, req.body.id);
+    const updatedBookmarkData = await bookmark.update(userId, req.body.id, title, address, x, y);
     return res.status(200).json({
       message: '회원 정보 수정에 성공했습니다.',
       data: updatedBookmarkData,
