@@ -1,6 +1,6 @@
-import { Entity, Column, ManyToMany, JoinTable } from 'typeorm';
+import { Entity, Column, OneToMany } from 'typeorm';
 import { DefaultEntity } from './Abstract';
-import { User } from './User';
+import { User_Character } from './';
 
 @Entity()
 export class Character extends DefaultEntity {
@@ -10,5 +10,5 @@ export class Character extends DefaultEntity {
   // 캐릭터 종류 (미정)
   @Column('int') type: number;
 
-  @ManyToMany(() => User) @JoinTable({ name: 'user_character' }) users: User[];
+  @OneToMany(() => User_Character, user_character => user_character.user) users: User_Character[];
 }
