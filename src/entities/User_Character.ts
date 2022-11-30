@@ -7,14 +7,14 @@ export class User_Character extends DefaultEntity {
   @PrimaryColumn()
   userId: number;
 
-  @ManyToOne(() => User, user => user.user_characters)
+  @ManyToOne(() => User, { eager: true })
   @JoinColumn({ name: 'userId' })
   user: User;
 
   @PrimaryColumn()
   characterId: number;
 
-  @ManyToOne(() => Character, character => character.user_characters)
+  @ManyToOne(() => Character, { eager: true })
   @JoinColumn({ name: 'characterId' })
   character: Character;
 

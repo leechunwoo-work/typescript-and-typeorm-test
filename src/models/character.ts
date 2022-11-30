@@ -37,9 +37,36 @@ export const change = async (userId: number, characterId: number) => {
 export const find = async (userId: number) => {
   const userRepository = AppDataSource.getRepository(User);
   const user = await userRepository.findOne({
-    relations: ['user_characters'],
+    relations: {
+      user_characters: true,
+    },
     where: {
       id: userId,
+      user_characters: {
+        isRepresent: false,
+      },
+    },
+    select: {
+      id: true,
+      email: true,
+      nickname: true,
+      newNotificationCount: true,
+      isChallengeNotificationEnabled: true,
+      isUltrafineDustNotificationEnabled: true,
+      user_characters: {
+        createdAt: true,
+        experience: true,
+        isRepresent: true,
+        user: {
+          id: false,
+        },
+        character: {
+          id: true,
+          name: true,
+          type: true,
+          levelMaxExperience: true,
+        },
+      },
     },
   });
 
