@@ -85,3 +85,47 @@ export const update = async (id: number, newUserInfo) => {
 export const withdrawal = async (id: number) => {
     return await update(id, { deletedAt: new Date() });
 };
+
+// 마이페이지 정보 조회
+export const getMyPageData = async (userId: number) => {
+    const userRepository = AppDataSource.getRepository(User);
+    const user = await userRepository.findOne({
+        relations: {
+            user_characters: true,
+        },
+        where: {
+            id: userId,
+            user_characters: {
+                isRepresent: true,
+            },
+        },
+        select: {
+            id: true,
+            email: true,
+            nickname: true,
+            notificationToken: true,
+            newNotificationCount: true,
+            isChallengeNotificationEnabled: true,
+            isUltrafineDustNotificationEnabled: true,
+            user_characters: {
+                createdAt: true,
+                experience: true,
+                isRepresent: true,
+                // TODO: Select 하는 방법 찾기
+                // user: {
+                //   id: false,
+                // },
+                // character: {
+                //   id: true,
+                //   name: true,
+                //   type: true,
+                //   levelMaxExperience: true,
+                // },
+            },
+        },
+    });
+
+    if (!user) return;
+
+    return user;
+};

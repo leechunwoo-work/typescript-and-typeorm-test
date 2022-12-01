@@ -167,3 +167,20 @@ export const update: VerifyController = async (req, res, next) => {
         return next(httpError.undefined);
     }
 };
+
+// 마이페이지 정보 조회
+export const getMyPageData: VerifyController = async (req, res, next) => {
+    try {
+        const userId = req.token!.data.id;
+
+        const characterInfo = await user.getMyPageData(userId);
+
+        return res.status(200).send({
+            message: '',
+            data: characterInfo,
+        });
+    } catch (error) {
+        logger.error(error);
+        return next(httpError.undefined);
+    }
+};

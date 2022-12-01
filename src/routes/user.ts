@@ -9,5 +9,6 @@ router.post('/signIn', user.signIn);
 router.delete('/', tokenVerify, user.withdrawal);
 router.patch('/', tokenVerify, user.update);
 router.get('/duplicateCheckBy', user.duplicateCheckBy);
+router.get('/mypage', tokenVerify, user.getMyPageData);
 
 export default router;

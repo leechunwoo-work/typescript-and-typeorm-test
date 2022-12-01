@@ -52,22 +52,9 @@ export const change: VerifyController = async (req, res, next) => {
     }
 };
 
-// 대표 캐릭터 조회
-export const find: VerifyController = async (req, res, next) => {
-    try {
-        const userId = req.token!.data.id;
-
-        const characterInfo = await character.find(userId);
-
-        return res.status(200).send({
-            data: characterInfo,
-        });
-    } catch (error) {
-        logger.error(error);
-        return next(httpError.undefined);
-    }
-};
-
+/*
+추후 개발
+--------------------------------------------------------------------
 // 생성
 export const create: VerifyController = async (req, res, next) => {
     try {
@@ -132,3 +119,5 @@ export const remove: VerifyController = async (req, res, next) => {
         return next(httpError.undefined);
     }
 };
+--------------------------------------------------------------------
+*/
