@@ -1,12 +1,12 @@
 import { DeleteDateColumn, CreateDateColumn, PrimaryGeneratedColumn } from 'typeorm';
 
 export abstract class DefaultEntity {
-  @PrimaryGeneratedColumn()
-  id: number;
+    @PrimaryGeneratedColumn()
+    id: number;
 
-  @CreateDateColumn()
-  createdAt: Date;
+    @CreateDateColumn()
+    createdAt: Date;
 
-  @DeleteDateColumn()
-  deletedAt: Date;
+    @DeleteDateColumn()
+    deletedAt: Date;
 }

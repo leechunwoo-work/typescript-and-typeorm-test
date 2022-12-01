@@ -4,11 +4,18 @@ import { User_Character } from './';
 
 @Entity()
 export class Character extends DefaultEntity {
-  // 누적 경험치
-  @Column('int', { default: 0 }) experience: number;
+    // 이름
+    @Column('varchar')
+    name: string;
 
-  // 캐릭터 종류 (미정)
-  @Column('int') type: number;
+    // 레벨당 최대 경험치
+    @Column('simple-array')
+    levelMaxExperience: number[];
 
-  @OneToMany(() => User_Character, user_character => user_character.user) users: User_Character[];
+    // 캐릭터 종류 (미정)
+    @Column('int')
+    type: number;
+
+    @OneToMany(() => User_Character, user_character => user_character.user)
+    user_characters: User_Character[];
 }

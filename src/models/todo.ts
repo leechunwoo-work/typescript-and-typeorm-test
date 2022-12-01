@@ -4,160 +4,154 @@ import { PaginationData } from '../utils/pagination';
 
 // 등록
 export const create = async (category: string, context: string, userId: number) => {
-  const userRepository = AppDataSource.getRepository(User);
+    const user = await AppDataSource.getRepository(User).findOneBy({ id: userId });
 
-  const user = await userRepository.findOne({
-    where: {
-      id: userId,
-    },
-  });
+    const todo = new Todo();
+    todo.category = category;
+    todo.context = context;
 
-  const todo = new Todo();
-  todo.category = category;
-  todo.context = context;
+    // 관계 연결
+    if (user) {
+        todo.users = [user];
+    }
 
-  // 관계 연결
-  if (user) {
-    todo.users = [user];
-  }
+    const result = await AppDataSource.manager.save(todo);
 
-  const result = await AppDataSource.manager.save(todo);
-
-  return result;
+    return result;
 };
 
 // 수정
 export const update = async (id: number, userId: number, category: string, context: string) => {
-  const todoRepository = AppDataSource.getRepository(Todo);
-  const todo = await todoRepository.findOne({
-    select: {
-      id: true,
-      category: true,
-      context: true,
-      experience: true,
-      createdAt: true,
-      deletedAt: true,
-      isCompleted: true,
-      users: {
-        id: false,
-      },
-    },
-    where: {
-      id,
-    },
-  });
+    const todoRepository = AppDataSource.getRepository(Todo);
+    const todo = await todoRepository.findOne({
+        select: {
+            id: true,
+            category: true,
+            context: true,
+            experience: true,
+            createdAt: true,
+            deletedAt: true,
+            isCompleted: true,
+            users: {
+                id: false,
+            },
+        },
+        where: {
+            id,
+        },
+    });
 
-  if (!todo) return;
+    if (!todo) return;
 
-  todo!.category = category;
-  todo!.context = context;
-  const result = await todoRepository.save(todo);
+    todo!.category = category;
+    todo!.context = context;
+    const result = await todoRepository.save(todo);
 
-  return result;
+    return result;
 };
 
 // 완료하기
 export const complete = async (id: number, userId: number, isCompleted: boolean) => {
-  // TODO: 캐릭터 경험치 올리기
-  const todoRepository = AppDataSource.getRepository(Todo);
-  const todo = await todoRepository.findOne({
-    select: {
-      id: true,
-      category: true,
-      context: true,
-      experience: true,
-      createdAt: true,
-      deletedAt: true,
-      isCompleted: true,
-      users: {
-        id: false,
-      },
-    },
-    where: {
-      users: {
-        id: userId,
-      },
-      id,
-    },
-  });
+    // TODO: 캐릭터 경험치 올리기
+    const todoRepository = AppDataSource.getRepository(Todo);
+    const todo = await todoRepository.findOne({
+        select: {
+            id: true,
+            category: true,
+            context: true,
+            experience: true,
+            createdAt: true,
+            deletedAt: true,
+            isCompleted: true,
+            users: {
+                id: false,
+            },
+        },
+        where: {
+            users: {
+                id: userId,
+            },
+            id,
+        },
+    });
 
-  if (!todo) return;
+    if (!todo) return;
 
-  todo!.isCompleted = isCompleted;
+    todo!.isCompleted = isCompleted;
 
-  const result = await todoRepository.save(todo);
+    const result = await todoRepository.save(todo);
 
-  return result;
+    return result;
 };
 
 // 목록
 export const getList = async (userId: number, page: number, limit: number, category?: string) => {
-  const { offset } = new PaginationData(page, limit);
+    const { offset } = new PaginationData(page, limit);
 
-  const todoRepository = AppDataSource.getRepository(Todo);
-  const query = {
-    relations: { users: true },
-    where: {
-      category: category,
-      users: {
-        id: userId,
-      },
-    },
-    select: {
-      id: true,
-      category: true,
-      context: true,
-      experience: true,
-      createdAt: true,
-      deletedAt: true,
-      isCompleted: true,
-      users: {
-        id: false,
-      },
-    },
-    skip: offset,
-    take: limit,
-  };
+    const todoRepository = AppDataSource.getRepository(Todo);
+    const query = {
+        relations: { users: true },
+        where: {
+            category: category,
+            users: {
+                id: userId,
+            },
+        },
+        select: {
+            id: true,
+            category: true,
+            context: true,
+            experience: true,
+            createdAt: true,
+            deletedAt: true,
+            isCompleted: true,
+            users: {
+                id: false,
+            },
+        },
+        skip: offset,
+        take: limit,
+    };
 
-  if (!category) delete query.where.category;
+    if (!category) delete query.where.category;
 
-  const [list, count] = await todoRepository.findAndCount(query);
+    const [list, count] = await todoRepository.findAndCount(query);
 
-  return {
-    list,
-    count,
-  };
+    return {
+        list,
+        count,
+    };
 };
 
 // 삭제
 export const remove = async (id: number, userId: number) => {
-  const todoRepository = AppDataSource.getRepository(Todo);
-  const todo = await todoRepository.findOne({
-    select: {
-      id: true,
-      category: true,
-      context: true,
-      experience: true,
-      createdAt: true,
-      deletedAt: true,
-      isCompleted: true,
-      users: {
-        id: false,
-      },
-    },
-    where: {
-      users: {
-        id: userId,
-      },
-      id: id,
-    },
-  });
+    const todoRepository = AppDataSource.getRepository(Todo);
+    const todo = await todoRepository.findOne({
+        select: {
+            id: true,
+            category: true,
+            context: true,
+            experience: true,
+            createdAt: true,
+            deletedAt: true,
+            isCompleted: true,
+            users: {
+                id: false,
+            },
+        },
+        where: {
+            users: {
+                id: userId,
+            },
+            id: id,
+        },
+    });
 
-  if (!todo) return;
+    if (!todo) return;
 
-  todo.deletedAt = new Date();
+    todo.deletedAt = new Date();
 
-  const result = await AppDataSource.manager.save(todo);
+    const result = await AppDataSource.manager.save(todo);
 
-  return result;
+    return result;
 };

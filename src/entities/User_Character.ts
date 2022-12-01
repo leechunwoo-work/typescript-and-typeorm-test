@@ -4,20 +4,25 @@ import { User, Character } from './';
 
 @Entity()
 export class User_Character extends DefaultEntity {
-  @PrimaryColumn()
-  userId: number;
+    @PrimaryColumn()
+    userId: number;
 
-  @ManyToOne(() => User, user => user.characters)
-  @JoinColumn({ name: 'userId' })
-  user: User;
+    @ManyToOne(() => User, { eager: true })
+    @JoinColumn({ name: 'userId' })
+    user: User;
 
-  @PrimaryColumn()
-  characterId: number;
+    @PrimaryColumn()
+    characterId: number;
 
-  @ManyToOne(() => Character, character => character.users)
-  @JoinColumn({ name: 'characterId' })
-  character: Character;
+    @ManyToOne(() => Character, { eager: true })
+    @JoinColumn({ name: 'characterId' })
+    character: Character;
 
-  @Column()
-  experience: number;
+    // 누적 경험치
+    @Column('int', { default: 0 })
+    experience: number;
+
+    // 대표 캐릭터 여부
+    @Column('boolean', { default: false })
+    isRepresent: boolean;
 }
