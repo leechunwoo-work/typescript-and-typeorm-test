@@ -10,5 +10,4 @@ export class updateTodoTable1669099827949 implements MigrationInterface {
     public async down(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`ALTER TABLE "todo" DROP COLUMN "isRecommended"`);
     }
-
 }
